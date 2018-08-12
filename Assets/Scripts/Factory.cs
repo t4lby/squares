@@ -11,6 +11,8 @@ public class Factory : MonoBehaviour
     public GameObject SquarePrefab;
     public GameObject DeathParticlesPrefab;
     public GameObject PickupPrefab;
+    public GameObject UIPrefab;
+    public GameObject CameraPrefab;
 
     private void Start()
     {
@@ -27,7 +29,8 @@ public class Factory : MonoBehaviour
         build.Squares[Vector3.zero] = SquareType.White;
         build.Squares[Vector3.up] = SquareType.Green;
         build.Squares[Vector3.up * 2] = SquareType.White;
-        build.Squares[Vector3.left * 2] = SquareType.Green;
+        build.Squares[Vector3.left] = SquareType.Green;
+        build.Squares[Vector3.right] = SquareType.Green;
 
         SpawnPlayer(
             build,
@@ -83,6 +86,7 @@ public class Factory : MonoBehaviour
                                                         position + square.Key * Game.SquareSize,
                                                         Vector3.zero,
                                                         Quaternion.identity);
+            player.Squares[square.Key].Player = player;
         }
 
 
@@ -108,9 +112,19 @@ public class Factory : MonoBehaviour
             }
         }
 
-        //TO DO: Attach UI and camera objects.
+        Game.Players.Add(player);
+
+        player.UI = CreateUI();
+        SpawnCamera(player);
 
         return player;
+    }
+
+    private UIController CreateUI()
+    {
+        var uiObject = Instantiate(UIPrefab);
+
+        return uiObject.GetComponent<UIController>();
     }
 
     /// <summary>
@@ -149,11 +163,20 @@ public class Factory : MonoBehaviour
         main.startColor = finalColor;
     }
 
+    private GameObject SpawnCamera(Player target)
+    {
+        var cam = Instantiate(CameraPrefab);
+        cam.GetComponent<CameraFollowTarget>().Target = target;
+        return cam;
+    }
+
     /// <summary>
     /// Spawns the pickup in the given position with given color and velocity
     /// and returns the pickup.
     /// </summary>
-    private Pickup SpawnPickup(Vector3 position, Vector3 velocity,SquareType color)
+    private Pickup SpawnPickup(Vector3 position,
+                               Vector3 velocity,
+                               SquareType color)
     {
         var pickupObject = Instantiate(PickupPrefab,
                                        position,

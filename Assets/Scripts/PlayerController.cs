@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour {
 	// Use this for initialization
 	private void Start ()
     {
-        Game.Player = this.gameObject;
+        //Game.Player = this.gameObject;
         _RB = GetComponent<Rigidbody2D>();
         if (Game.PlayerInventory == null)
         {

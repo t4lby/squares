@@ -23,7 +23,7 @@ public class SquareGenerator : MonoBehaviour {
     {
         if (Time.time > nextSpawn)
         {
-            RandomInCircle(Game.Player.transform.position, MinSpawnRadius, MaxSpawnRadius, true);
+            //RandomInCircle(Game.Player.transform.position, MinSpawnRadius, MaxSpawnRadius, true);
             nextSpawn = Time.time + spawnDiff;
         }
 	}

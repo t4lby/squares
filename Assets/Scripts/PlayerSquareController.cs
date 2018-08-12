@@ -14,7 +14,7 @@ public class PlayerSquareController : SquareController
     void Start()
     {
         var joint = this.gameObject.AddComponent<FixedJoint2D>();
-        joint.connectedBody = Game.Player.GetComponent<Rigidbody2D>();
+        //joint.connectedBody = Game.Player.GetComponent<Rigidbody2D>();
     }
 
 
@@ -33,7 +33,7 @@ public class PlayerSquareController : SquareController
         {
             var squareType = collision.gameObject.GetComponent<Pickup>().Type;
             Game.PlayerInventory[squareType] += 1;
-            Game.Player.GetComponent<PlayerController>().UpdateSquareCountUI();
+            //Game.Player.GetComponent<PlayerController>().UpdateSquareCountUI();
             Destroy(collision.gameObject);
         }
         if (collision.gameObject.CompareTag("Square"))

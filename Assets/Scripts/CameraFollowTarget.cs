@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraFollowTarget : MonoBehaviour {
-
-    public Transform Target;
+    
+    public Player Target;
 
     public float SmoothSpeed = 0.125f;
 
@@ -12,6 +12,8 @@ public class CameraFollowTarget : MonoBehaviour {
 	
 	private void LateUpdate ()
     {
-        transform.position = Vector3.Lerp(transform.position, Target.position + Offset, SmoothSpeed);
+        transform.position = Vector3.Lerp(transform.position,
+                                          Target.GetPosition() + Offset,
+                                          SmoothSpeed);
 	}
 }

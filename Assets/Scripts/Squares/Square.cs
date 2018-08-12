@@ -42,15 +42,10 @@ public abstract class Square : MonoBehaviour
     protected float MinimumTransparency { get; set; }
 
     /// <summary>
-    /// Indicates whether the square is part of a player.
-    /// </summary>
-    protected bool IsPlayerSquare { get; set; }
-
-    /// <summary>
     /// The player object that this square is part of. Only relevent if
     /// <see cref="IsPlayerSquare"/> is true.
     /// </summary>
-    protected Player Player { get; set; }
+    public Player Player { get; set; }
 
     /// <summary>
     /// The factory responsible for the creation of this object.
@@ -88,33 +83,11 @@ public abstract class Square : MonoBehaviour
 
             if (Health < 0)
             {
-                var spriteRenderer = this.GetComponent<SpriteRenderer>();
-
-                //SPAWN PARTICLE SYSTEM (change to a call to the Factory)
-                /*
-                Color particleColor = _SR.color;
-                particleColor.a = DeathParticleTransparency;
-                ParticleSystem.MainModule settings = DeathParticles.GetComponent<ParticleSystem>().main;
-                settings.startColor = particleColor;
-                Instantiate(DeathParticles, this.transform.position, DeathParticles.transform.rotation);*/
-
-                //SPAWN DEAD SQUARE OBJECT THAT GRAVITATES TOWARDS PLAYER.
-
-                /* (change to call to factory to instantiate pickup)
-                GameObject spawnedPickup = Instantiate(Pickup, this.transform.position, Quaternion.identity);
-                spawnedPickup.GetComponent<PickupController>().Type = this.SType;
-                Color pickupColor = _SR.color;
-                pickupColor.a = 1;
-                spawnedPickup.GetComponent<SpriteRenderer>().color = pickupColor;
-                spawnedPickup.GetComponent<Rigidbody2D>().velocity = _RB.velocity;
-                */
-
-                //DESTROY THE GAME OBJECT
                 Factory.DestroySquare(this);
             }
         }
 
-        if (collision.gameObject.CompareTag("Pickup") & this.IsPlayerSquare)
+        if (collision.gameObject.CompareTag("Pickup") & this.Player != null)
         {
             var color = collision.gameObject.GetComponent<Pickup>().Type;
             this.Player.PickupSquare(color);

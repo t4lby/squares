@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Schema;
 
 public class Player
 {
@@ -24,6 +25,14 @@ public class Player
     {
         this.Squares = new Dictionary<Vector3, Square>();
     }
-    //TO DO: calculate player game object position by average position
-    // of squares.
+
+    public Vector3 GetPosition()
+    {
+        var total = new Vector3();
+        foreach (var pair in Squares)
+        {
+            total += pair.Value.transform.position;
+        }
+        return total / Squares.Count;
+    }
 }
