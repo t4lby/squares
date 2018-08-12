@@ -23,19 +23,26 @@ public class Factory : MonoBehaviour
             new Vector3(0, 1, 0),
             Quaternion.identity);
 
-        var inv = new Inventory();
-        var build = new Build();
 
-        build.Squares[Vector3.zero] = SquareType.White;
-        build.Squares[Vector3.up] = SquareType.Green;
-        build.Squares[Vector3.up * 2] = SquareType.White;
-        build.Squares[Vector3.left] = SquareType.Green;
-        build.Squares[Vector3.right] = SquareType.Green;
 
-        SpawnPlayer(
-            build,
-            inv,
-            Vector3.zero);
+        if (Game.Players.Count == 0)
+        {
+            var inv = new Inventory();
+            var build = new Build();
+            build.Squares[Vector3.zero] = SquareType.White;
+            Game.Players.Add(
+                SpawnNewPlayer(
+                    build,
+                    inv,
+                    Vector3.zero));
+        }
+        else
+        {
+            Game.Players[0] = SpawnNewPlayer(
+                Game.Players[0].Build,
+                Game.Players[0].Inventory,
+                Vector3.zero);
+        }
     }
 
     private Square SpawnSquare(SquareType color,
@@ -72,25 +79,23 @@ public class Factory : MonoBehaviour
     /// 
     /// Fixed joints are put in on squares that are next to one another.
     /// </summary>
-    private Player SpawnPlayer(Build build, Inventory inventory, Vector3 position)
+    private Player SpawnNewPlayer(Build build, Inventory inventory, Vector3 position)
     {
         var player = new Player
         {
             Inventory = inventory
         };
 
-        // instantiate initial square.
-        foreach (var square in build.Squares)
+        foreach (var pair in build.Squares)
         {
-            player.Squares[square.Key] = this.SpawnSquare(square.Value,
-                                                        position + square.Key * Game.SquareSize,
+            player.Squares[pair.Key] = this.SpawnSquare(pair.Value,
+                                                        position + pair.Key * Game.SquareSize,
                                                         Vector3.zero,
                                                         Quaternion.identity);
-            player.Squares[square.Key].Player = player;
+            player.Squares[pair.Key].Player = player;
+            player.Squares[pair.Key].PositionInPlayer = pair.Key;
         }
 
-
-        //Attach only neighbouring squares with fixed joints.
         var directions = new List<Vector3>
             {
                 Vector3.up,
@@ -99,11 +104,11 @@ public class Factory : MonoBehaviour
                 Vector3.right
             };
 
-        foreach (var square in build.Squares)
+        foreach (var square in player.Squares)
         {
             foreach (var direction in directions)
             {
-                if (build.Squares.ContainsKey(square.Key + direction))
+                if (player.Squares.ContainsKey(square.Key + direction))
                 {
                     this.FixSquares(
                         player.Squares[square.Key],
@@ -111,14 +116,52 @@ public class Factory : MonoBehaviour
                 }
             }
         }
-
-        Game.Players.Add(player);
-
         player.UI = CreateUI();
+        player.UI.UpdateSquareCountUI(inventory.Squares);
         SpawnCamera(player);
-
+        player.Build = build;
         return player;
     }
+
+    /// <summary>
+    /// Given a player object, will spawn that player in the 
+    /// given <paramref name="position"/>.
+    /// </summary>
+    private Player SpawnPlayer(Player player, Vector3 position)
+    {
+        foreach (var square in player.Squares)
+        {
+            this.SpawnSquare(square.Value.Color,
+                            position + square.Key * Game.SquareSize,
+                            Vector3.zero,
+                            Quaternion.identity);
+        }
+
+        var directions = new List<Vector3>
+            {
+                Vector3.up,
+                Vector3.down,
+                Vector3.left,
+                Vector3.right
+            };
+
+        foreach (var square in player.Squares)
+        {
+            foreach (var direction in directions)
+            {
+                if (player.Squares.ContainsKey(square.Key + direction))
+                {
+                    this.FixSquares(
+                        player.Squares[square.Key],
+                        player.Squares[square.Key + direction]);
+                }
+            }
+        }
+        player.UI = CreateUI();
+        SpawnCamera(player);
+        return player;
+    }
+
 
     private UIController CreateUI()
     {
@@ -194,6 +237,11 @@ public class Factory : MonoBehaviour
         this.SpawnPickup(square.transform.position,
                          square.GetComponent<Rigidbody2D>().velocity,
                          square.Color);
+        if (square.Player != null)
+        {
+            square.Player.Build.Squares.Remove(square.PositionInPlayer);
+            square.Player.Squares.Remove(square.PositionInPlayer);
+        }
         Destroy(square.gameObject);
     }
 

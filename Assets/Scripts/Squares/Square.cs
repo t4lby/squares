@@ -48,6 +48,11 @@ public abstract class Square : MonoBehaviour
     public Player Player { get; set; }
 
     /// <summary>
+    /// The key for this square in the players build.
+    /// </summary>
+    public Vector3 PositionInPlayer { get; set; }
+
+    /// <summary>
     /// The factory responsible for the creation of this object.
     /// </summary>
     public Factory Factory { get; set; }

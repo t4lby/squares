@@ -11,7 +11,7 @@ public class Build
     /// The vectors in this are expcted in the format (int, int, 0)
     /// TO TO: implement something enforcing this.
     /// </summary>
-    public Dictionary<Vector3, SquareType> Squares { get; private set; }
+    public Dictionary<Vector3, SquareType> Squares { get; set; }
 
     public Build()
     {

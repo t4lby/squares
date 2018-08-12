@@ -10,23 +10,22 @@ public class BuilderController : MonoBehaviour {
 
     public SquareType SelectedSquare;
 
-    private Dictionary<SquareType, int> invStub;
+    public UIController UI;
+
+    private Player _Player;
     private List<GameObject> _BuildSquares;
 
 	private void Start ()
     {
+        //For multiplayer get player by some sort of unique ID.
+        _Player = Game.Players[0];
+
         _BuildSquares = new List<GameObject>();
         SelectedSquare = SquareType.Green;
 
+        UI.UpdateSquareCountUI(_Player.Inventory.Squares);
 
-        //TESTING STUB VALUES
-        Game.PlayerBuild[Vector3.zero] = SquareType.White;
-        Assemble(Game.PlayerBuild);
-
-        invStub = new Dictionary<SquareType, int>();
-
-        invStub[SquareType.Red] = 2;
-        invStub[SquareType.Green] = 4;
+        Assemble(_Player.Build.Squares);
 	}
 	
 	private void Update ()
@@ -34,18 +33,17 @@ public class BuilderController : MonoBehaviour {
         if (Input.GetMouseButtonDown(0))
         {
             Vector3 gridPoint = GridSnap2D(Camera.main.ScreenToWorldPoint(Input.mousePosition), Game.SquareSize);
-            if (gridPoint != Vector3.zero)
+            if (_Player.Inventory.Squares[SelectedSquare] > 0)
             {
-                Game.PlayerBuild[gridPoint] = SelectedSquare;
+                _Player.Build.Squares[gridPoint] = SelectedSquare;
+                _Player.Inventory.Squares[SelectedSquare] -= 1;
             }
-            //BAD dissasembles and reassembles everytime.
-            //EVEN BADDER, adds a white player square and removes it every time.
-            Game.PlayerBuild[Vector3.zero] = SquareType.White;
+
+            UI.UpdateSquareCountUI(_Player.Inventory.Squares);
             Dismantle();
-            Assemble(Game.PlayerBuild);
-            Game.PlayerBuild.Remove(Vector3.zero);
+            Assemble(_Player.Build.Squares);
         }
-        if (Input.GetKeyDown(KeyCode.B))
+        if (Input.GetKeyDown(KeyCode.T))
         {
             SceneManager.LoadScene("Test");
         }
@@ -70,17 +68,15 @@ public class BuilderController : MonoBehaviour {
         }
     }
 
-    private void Assemble(Dictionary<Vector3, SquareType> build)
+    private void Assemble(Dictionary<Vector3, SquareType> squares)
     {
-        foreach (var item in build)
+        foreach (var item in squares)
         {
             var square = Instantiate(BuildSquarePrefab,
                                     item.Key * Game.SquareSize,
                                     Quaternion.identity);
             square.GetComponent<SpriteRenderer>().color = Game.GetColor(item.Value);
             _BuildSquares.Add(square);
-            //var Joint = square.AddComponent<FixedJoint2D>();
-            //Joint.connectedBody = Game.Player.GetComponent<Rigidbody2D>();
         }
     }
 }

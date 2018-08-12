@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class UIController : MonoBehaviour
 {
@@ -13,14 +14,12 @@ public class UIController : MonoBehaviour
 
     private Dictionary<SquareType, GameObject> SquareCounts;
 
-    private void Start()
-    {
-
-    }
-
     private void Update()
     {
-
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            SceneManager.LoadScene("Editor");
+        }
     }
 
     public void UpdateSquareCountUI(Dictionary<SquareType, int> inventory)

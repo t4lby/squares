@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml.Schema;
+using System.Runtime.InteropServices;
 
 public class Player
 {
@@ -12,6 +13,14 @@ public class Player
 
     public Inventory Inventory { get; set; }
 
+    /// <summary>
+    /// The players build (should correspond to squares)
+    /// </summary>
+    public Build Build { get; set; }
+
+    /// <summary>
+    /// The square objects themselves.
+    /// </summary>
     public Dictionary<Vector3,Square> Squares { get; set; }
 
     public void PickupSquare(SquareType color)
