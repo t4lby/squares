@@ -34,7 +34,7 @@ public abstract class Square : MonoBehaviour
     /// <summary>
     /// The color of the square.
     /// </summary>
-    protected SquareType Color { get; set; }
+    public SquareType Color { get; set; }
 
     /// <summary>
     /// From 0 to 1, the minimum transparency the square gets to before death.
@@ -110,7 +110,7 @@ public abstract class Square : MonoBehaviour
                 */
 
                 //DESTROY THE GAME OBJECT
-                Destroy(this.gameObject);
+                Factory.DestroySquare(this);
             }
         }
 

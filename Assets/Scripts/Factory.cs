@@ -47,15 +47,6 @@ public class Factory : MonoBehaviour
         return squareScript;
     }
 
-    public Pickup SpawnPickup(SquareType color,
-                             Vector3 position,
-                             Vector3 velocity,
-                             Quaternion rotation)
-    {
-        var pickupObject = Instantiate(PickupPrefab);
-        return pickupObject.AddComponent<Pickup>();
-    }
-
     /// <summary>
     /// Attachs the square component of given type to the game object.
     /// </summary>
@@ -138,7 +129,7 @@ public class Factory : MonoBehaviour
     /// </summary>
     private void BreakSquare(Square squareA, Square squareB)
     {
-        throw new NotImplementedException();
+        //needs to be implemented.
     }
 
     /// <summary>
@@ -148,10 +139,14 @@ public class Factory : MonoBehaviour
     private void SpawnDeathParticles(Vector3 position, SquareType color)
     {
         var particleObject = 
-            Instantiate(DeathParticlesPrefab, position, Quaternion.identity);
+            Instantiate(DeathParticlesPrefab,
+                        position,
+                        DeathParticlesPrefab.transform.rotation);
 
-        particleObject.GetComponent<SpriteRenderer>()
-                      .color = Game.GetColor(color);
+        var main = particleObject.GetComponent<ParticleSystem>().main;
+        var finalColor = Game.GetColor(color);
+        finalColor.a = Game.DeathParticleTransparency;
+        main.startColor = finalColor;
     }
 
     /// <summary>
@@ -172,7 +167,11 @@ public class Factory : MonoBehaviour
 
     public void DestroySquare(Square square)
     {
-        throw new NotImplementedException();
+        this.SpawnDeathParticles(square.transform.position, square.Color);
+        this.SpawnPickup(square.transform.position,
+                         square.GetComponent<Rigidbody2D>().velocity,
+                         square.Color);
+        Destroy(square.gameObject);
     }
 
 }

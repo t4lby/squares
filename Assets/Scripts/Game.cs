@@ -8,6 +8,7 @@ using System;
 public static class Game
 {
     public const float SquareSize = 0.5f;
+    public const float DeathParticleTransparency = 0.5f;
     public static GameObject Player;
     public static Dictionary<Vector3, SquareType> PlayerBuild = new Dictionary<Vector3, SquareType>();
     public static Dictionary<SquareType, int> PlayerInventory;
