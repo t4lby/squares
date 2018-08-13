@@ -24,7 +24,7 @@ public class WhiteSquare : Square
         this.Durability = 10;
         this.Invincible = true;
         this.Color = SquareType.White;
-        this.Acceleration = 10;
+        this.Acceleration = 20;
     }
 
     private void Update()

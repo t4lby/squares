@@ -149,6 +149,8 @@ MonoBehaviour:
   UIPrefab: {fileID: 1621319685659670, guid: 0409d6d21e35a48ceb0c0ea2bce77c49, type: 2}
   CameraPrefab: {fileID: 1930795669150178, guid: f20bf524228e24f46bcaa6cc2293a565,
     type: 2}
+  BoostParticlesPrefab: {fileID: 1477971608935844, guid: 5c4418068c9244a41baacd54e4e06f1d,
+    type: 2}
 --- !u!4 &430473194
 Transform:
   m_ObjectHideFlags: 0

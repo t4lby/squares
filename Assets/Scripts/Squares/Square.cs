@@ -42,8 +42,7 @@ public abstract class Square : MonoBehaviour
     protected float MinimumTransparency { get; set; }
 
     /// <summary>
-    /// The player object that this square is part of. Only relevent if
-    /// <see cref="IsPlayerSquare"/> is true.
+    /// The player object that this square is part of.
     /// </summary>
     public Player Player { get; set; }
 
@@ -56,6 +55,13 @@ public abstract class Square : MonoBehaviour
     /// The factory responsible for the creation of this object.
     /// </summary>
     public Factory Factory { get; set; }
+
+    /// <summary>
+    /// Determines whether the squares behavior is triggered. ie a booster
+    /// square that is currently <see cref=" Triggered"/> will be exerting a
+    /// force. But for non functional squares this will do nothing.
+    /// </summary>
+    public bool Triggered { get; set; }
 
     protected abstract void SetSquareProperties();
 

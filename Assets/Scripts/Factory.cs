@@ -13,17 +13,22 @@ public class Factory : MonoBehaviour
     public GameObject PickupPrefab;
     public GameObject UIPrefab;
     public GameObject CameraPrefab;
+    public GameObject BoostParticlesPrefab;
 
     private void Start()
     {
-        //TESTING STUB
+
         SpawnSquare(
             SquareType.Green,
             new Vector3(0, 3, 0),
             new Vector3(0, 1, 0),
             Quaternion.identity);
 
-
+        var purpleSquare = SpawnSquare(
+            SquareType.Purple,
+            new Vector3(3, 0, 0),
+            Vector3.zero,
+            Quaternion.identity);
 
         if (Game.Players.Count == 0)
         {
@@ -68,6 +73,11 @@ public class Factory : MonoBehaviour
                 return square.AddComponent<GreenSquare>();
             case SquareType.White:
                 return square.AddComponent<WhiteSquare>();
+            case SquareType.Purple:
+                var purple = square.AddComponent<PurpleSquare>();
+                purple.Particles = SpawnBoostParticles(purple.gameObject.transform,
+                                                       SquareType.Purple);
+                return purple;
             default:
                 throw new UnityException(message: "Square type not found.");
         }
@@ -211,6 +221,15 @@ public class Factory : MonoBehaviour
         var cam = Instantiate(CameraPrefab);
         cam.GetComponent<CameraFollowTarget>().Target = target;
         return cam;
+    }
+
+    private GameObject SpawnBoostParticles(Transform parent, SquareType color)
+    {
+        var particles = Instantiate(BoostParticlesPrefab,
+                                    parent);
+        var main = particles.GetComponent<ParticleSystem>().main;
+        main.startColor = Game.GetColor(color);
+        return particles;
     }
 
     /// <summary>
