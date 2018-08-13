@@ -17,6 +17,7 @@ public class Factory : MonoBehaviour
 
     private void Start()
     {
+        //Test instances of each square type.
 
         SpawnSquare(
             SquareType.Green,
@@ -24,7 +25,13 @@ public class Factory : MonoBehaviour
             new Vector3(0, 1, 0),
             Quaternion.identity);
 
-        var purpleSquare = SpawnSquare(
+        SpawnSquare(
+            SquareType.Blue,
+            new Vector3(0, -3, 0),
+            new Vector3(0, -1, 0),
+            Quaternion.identity);
+
+        SpawnSquare(
             SquareType.Purple,
             new Vector3(3, 0, 0),
             Vector3.zero,
@@ -73,6 +80,8 @@ public class Factory : MonoBehaviour
                 return square.AddComponent<GreenSquare>();
             case SquareType.White:
                 return square.AddComponent<WhiteSquare>();
+            case SquareType.Blue:
+                return square.AddComponent<BlueSquare>();
             case SquareType.Purple:
                 var purple = square.AddComponent<PurpleSquare>();
                 purple.Particles = SpawnBoostParticles(purple.gameObject.transform,

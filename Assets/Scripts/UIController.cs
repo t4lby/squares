@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.Security.Cryptography.X509Certificates;
 
 public class UIController : MonoBehaviour
 {
@@ -11,8 +12,7 @@ public class UIController : MonoBehaviour
     public GameObject SquareCountPrefab;
     public Vector3 FirstCountPosition;
     public Vector3 DiffCountPosition;
-
-    private Dictionary<SquareType, GameObject> SquareCounts;
+    public Dictionary<SquareType, GameObject> SquareCounts;
 
     private void Update()
     {
@@ -56,6 +56,4 @@ public class UIController : MonoBehaviour
             }
         }
     }
-
-
 }

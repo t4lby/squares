@@ -17,19 +17,6 @@ public class PurpleSquare : Square
         this._Acceleration = 10;
     }
 
-    private void Update()
-    {
-        //TEST STUB REMOVE!
-        if (Input.GetKey(KeyCode.P))
-        {
-            Triggered = true;
-        }
-        else
-        {
-            Triggered = false;
-        }
-    }
-
     private void FixedUpdate() 
     {
         if (Triggered)

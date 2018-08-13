@@ -1,15 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Experimental.UIElements;
 using UnityEngine.SceneManagement;
 using System.Linq;
+using TMPro;
+using UnityEngine.UI;
 
 public class BuilderController : MonoBehaviour {
 
     public GameObject BuildSquarePrefab; 
 
     public SquareType SelectedSquare;
+
+    private bool _Erase;
 
     public UIController UI;
 
@@ -18,13 +21,24 @@ public class BuilderController : MonoBehaviour {
 
 	private void Start ()
     {
-        //For multiplayer get player by some sort of unique ID.
-        _Player = Game.Players[0];
+        if (Game.Players.Count > 0)
+        {
+            _Player = Game.Players[0];
+        }
+        else
+        {
+            _Player = new Player();
+            Game.Players.Add(_Player);
+            _Player.Build = new Build();
+            _Player.Inventory = new Inventory();
+            _Player.Build.Squares.Add(Vector3.zero, SquareType.White);
+        }
 
         _BuildSquares = new List<GameObject>();
         SelectedSquare = SquareType.Green;
 
         UI.UpdateSquareCountUI(_Player.Inventory.Squares);
+        this.UpdateUIButtons(UI);
 
         Assemble(_Player.Build.Squares);
 	}
@@ -36,7 +50,16 @@ public class BuilderController : MonoBehaviour {
             Vector3 gridPoint = 
                 GridSnap2D(Camera.main.ScreenToWorldPoint(Input.mousePosition),
                            Game.SquareSize);
-            if (_Player.Inventory.Squares[SelectedSquare] > 0 &&
+            if (_Erase)
+            {
+                if (_Player.Build.Squares.ContainsKey(gridPoint))
+                {
+                    var color = _Player.Build.Squares[gridPoint];
+                    _Player.Inventory.Squares[color] += 1;
+                    _Player.Build.Squares.Remove(gridPoint);
+                }
+            }
+            else if (_Player.Inventory.Squares[SelectedSquare] > 0 &&
                 (IsNextToSquare(gridPoint) | _Player.Build.Squares.Count == 0))
             {
                 _Player.Build.Squares[gridPoint] = SelectedSquare;
@@ -44,6 +67,7 @@ public class BuilderController : MonoBehaviour {
             }
 
             UI.UpdateSquareCountUI(_Player.Inventory.Squares);
+            this.UpdateUIButtons(UI);
             Dismantle();
             Assemble(_Player.Build.Squares);
         }
@@ -101,5 +125,25 @@ public class BuilderController : MonoBehaviour {
             }
         }
         return false;
+    }
+
+    private void UpdateUIButtons(UIController uI)
+    {
+        foreach(var squareCount in uI.SquareCounts)
+        {
+            var button = squareCount.Value.GetComponent<Button>();
+            button.onClick.AddListener(delegate { SelectSquare(squareCount.Key); });
+        }
+    }
+
+    public void SetErase(bool value)
+    {
+        _Erase = value;
+    }
+
+    public void SelectSquare(SquareType color)
+    {
+        SelectedSquare = color;
+        SetErase(false);
     }
 }
