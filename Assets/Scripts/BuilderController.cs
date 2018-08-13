@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Experimental.UIElements;
 using UnityEngine.SceneManagement;
+using System.Linq;
 
 public class BuilderController : MonoBehaviour {
 
@@ -32,8 +33,11 @@ public class BuilderController : MonoBehaviour {
     {
         if (Input.GetMouseButtonDown(0))
         {
-            Vector3 gridPoint = GridSnap2D(Camera.main.ScreenToWorldPoint(Input.mousePosition), Game.SquareSize);
-            if (_Player.Inventory.Squares[SelectedSquare] > 0)
+            Vector3 gridPoint = 
+                GridSnap2D(Camera.main.ScreenToWorldPoint(Input.mousePosition),
+                           Game.SquareSize);
+            if (_Player.Inventory.Squares[SelectedSquare] > 0 &&
+                (IsNextToSquare(gridPoint) | _Player.Build.Squares.Count == 0))
             {
                 _Player.Build.Squares[gridPoint] = SelectedSquare;
                 _Player.Inventory.Squares[SelectedSquare] -= 1;
@@ -78,5 +82,24 @@ public class BuilderController : MonoBehaviour {
             square.GetComponent<SpriteRenderer>().color = Game.GetColor(item.Value);
             _BuildSquares.Add(square);
         }
+    }
+
+    private bool IsNextToSquare(Vector3 position)
+    {
+        var directions = new List<Vector3>
+        {
+            Vector3.up,
+            Vector3.down,
+            Vector3.left,
+            Vector3.right
+        };
+        foreach (var d in directions)
+        {
+            if (_Player.Build.Squares.ContainsKey(position+d))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }
