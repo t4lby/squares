@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System;
 
 /// <summary>
 /// Mono-behavoir solely for building and initialising GameObjects.
@@ -17,29 +16,13 @@ public class Factory : MonoBehaviour
 
     private void Start()
     {
-        //Test instances of each square type.
-
-        SpawnSquare(
-            SquareType.Green,
-            new Vector3(0, 3, 0),
-            new Vector3(0, 1, 0),
-            Quaternion.identity);
-
-        SpawnSquare(
-            SquareType.Blue,
-            new Vector3(0, -3, 0),
-            new Vector3(0, -1, 0),
-            Quaternion.identity);
-
-        SpawnSquare(
-            SquareType.Purple,
-            new Vector3(3, 0, 0),
-            Vector3.zero,
-            Quaternion.identity);
-
+        
         if (Game.Players.Count == 0)
         {
             var inv = new Inventory();
+            inv.Squares[SquareType.Purple] = 50;
+            inv.Squares[SquareType.Blue] = 20;
+            inv.Squares[SquareType.Green] = 10;
             var build = new Build();
             build.Squares[Vector3.zero] = SquareType.White;
             Game.Players.Add(
@@ -54,6 +37,18 @@ public class Factory : MonoBehaviour
                 Game.Players[0].Build,
                 Game.Players[0].Inventory,
                 Vector3.zero);
+        }
+    }
+
+    //test stub
+    private float nextSpawn;
+    private float spawnDiff = 1;
+    private void Update()
+    {
+        if (Time.time > nextSpawn)
+        {
+            SpawnRandomSquareInCircle(Game.Players[0].GetPosition(), 3, 10, true);
+            nextSpawn = Time.time + spawnDiff;
         }
     }
 
@@ -273,4 +268,19 @@ public class Factory : MonoBehaviour
         Destroy(square.gameObject);
     }
 
+    private void SpawnRandomSquareInCircle(Vector3 centre, float minRadius, float maxRadius, bool randomRotation)
+    {
+        var rotation = Quaternion.identity;
+        if (randomRotation)
+        {
+            rotation.eulerAngles = new Vector3(0, 0, Random.Range(0, 90));
+        }
+
+        SquareType sType = Game.ActiveSquareTypes[Random.Range(0, Game.ActiveSquareTypes.Count)];
+
+        var angle = Random.Range(0, 360);
+        var position = centre + Random.Range(minRadius, maxRadius) * new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0);
+
+        SpawnSquare(sType, position, Vector3.zero, rotation);
+    }
 }

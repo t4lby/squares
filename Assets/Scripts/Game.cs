@@ -14,7 +14,12 @@ public static class Game
     public static Dictionary<SquareType, int> PlayerInventory;
     public static UIController UI;
 
-    public static List<SquareType> ActiveSquareTypes = new List<SquareType>{ SquareType.Red, SquareType.Green };
+    public static List<SquareType> ActiveSquareTypes = new List<SquareType>
+    { 
+        SquareType.Green,
+        SquareType.Blue,
+        SquareType.Purple
+    };
 
 
 
