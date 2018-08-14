@@ -100,14 +100,24 @@ public class Factory : MonoBehaviour
             Inventory = inventory
         };
 
-        foreach (var pair in build.Squares)
+        foreach (var buildPair in build.Squares)
         {
-            player.Squares[pair.Key] = this.SpawnSquare(pair.Value,
-                                                        position + pair.Key * Game.SquareSize,
+            var rotation = build.Rotations.ContainsKey(buildPair.Key) ?
+                                build.Rotations[buildPair.Key] :
+                                Quaternion.identity;
+            player.Squares[buildPair.Key] = this.SpawnSquare(buildPair.Value,
+                                                        position + buildPair.Key * Game.SquareSize,
                                                         Vector3.zero,
-                                                        Quaternion.identity);
-            player.Squares[pair.Key].Player = player;
-            player.Squares[pair.Key].PositionInPlayer = pair.Key;
+                                                        rotation);
+            player.Squares[buildPair.Key].Player = player;
+            player.Squares[buildPair.Key].Regenerates = true;
+            player.Squares[buildPair.Key].PositionInPlayer = buildPair.Key;
+            if (build.Mappings.ContainsKey(buildPair.Key))
+            {
+                player.Squares[buildPair.Key].Mapped = true;
+                player.Squares[buildPair.Key].Mapping =
+                    build.Mappings[buildPair.Key];
+            }
         }
 
         var directions = new List<Vector3>
@@ -263,6 +273,8 @@ public class Factory : MonoBehaviour
         if (square.Player != null)
         {
             square.Player.Build.Squares.Remove(square.PositionInPlayer);
+            square.Player.Build.Rotations.Remove(square.PositionInPlayer);
+            square.Player.Build.Mappings.Remove(square.PositionInPlayer);
             square.Player.Squares.Remove(square.PositionInPlayer);
         }
         Destroy(square.gameObject);

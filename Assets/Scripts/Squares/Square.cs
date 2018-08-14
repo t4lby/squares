@@ -5,7 +5,7 @@ using UnityEditor;
 public abstract class Square : MonoBehaviour
 {
     /// <summary>
-    /// The health of the square.
+    /// The health of the square. from 0 to 1.
     /// </summary>
     protected float Health { get; set; }
 
@@ -23,7 +23,7 @@ public abstract class Square : MonoBehaviour
     /// <summary>
     /// Indicates whether the square regenrates it's health;
     /// </summary>
-    protected bool Regenerates { get; set; }
+    public bool Regenerates { get; set; }
 
     /// <summary>
     /// The regeneration speed of the square. (only relevent if 
@@ -63,6 +63,16 @@ public abstract class Square : MonoBehaviour
     /// </summary>
     public bool Triggered { get; set; }
 
+    /// <summary>
+    /// If the square has a key mapping it is stored here.
+    /// </summary>
+    public KeyCode Mapping { get; set; }
+
+    /// <summary>
+    /// Indicates whether the squuare has a mapping.
+    /// </summary>
+    public bool Mapped { get; set; }
+
     protected abstract void SetSquareProperties();
 
     /// <summary>
@@ -77,6 +87,15 @@ public abstract class Square : MonoBehaviour
                       current.g,
                       current.b,
                       MinimumTransparency + Health * (1 - MinimumTransparency));
+    }
+
+    private void Update()
+    {
+        if (Regenerates & Health < 1)
+        {
+            Health += RegenerationSpeed * Time.deltaTime;
+            this.UpdateTransparency();
+        }
     }
 
     private void Awake()

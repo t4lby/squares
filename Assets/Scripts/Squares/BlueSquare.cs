@@ -4,10 +4,6 @@ using System.Collections.Generic;
 
 public class BlueSquare : Square
 {
-    private KeyCode _KeyMapping = KeyCode.L;
-
-    private bool _Mapped = true;
-
     private Color _TriggeredColor = new Color(0,1,1);
 
     protected override void SetSquareProperties()
@@ -17,17 +13,7 @@ public class BlueSquare : Square
         this.Invincible = false;
         this.Color = SquareType.Blue;
         this.MinimumTransparency = 0.25f;
-    }
-
-    public void MapKey(KeyCode key)
-    {
-        _KeyMapping = key;
-        _Mapped = true;
-    }
-
-    public void UnmapKey()
-    {
-        _Mapped = false;
+        this.RegenerationSpeed = 0.5f;
     }
 
     private void Update()
@@ -59,11 +45,11 @@ public class BlueSquare : Square
 
     private void ProcessTriggers()
     {
-        if (Input.GetKeyDown(_KeyMapping))
+        if (Input.GetKeyDown(Mapping))
         {
             SetTriggerSurrounding(true);
         }
-        if (Input.GetKeyUp(_KeyMapping))
+        if (Input.GetKeyUp(Mapping))
         {
             SetTriggerSurrounding(false);
         }

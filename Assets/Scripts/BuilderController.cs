@@ -5,6 +5,16 @@ using UnityEngine.SceneManagement;
 using System.Linq;
 using TMPro;
 using UnityEngine.UI;
+using System;
+
+public enum Tool 
+{
+    Select,
+    Erase,
+    Rotate,
+    Assign,
+    WaitForKeyPress
+}
 
 public class BuilderController : MonoBehaviour {
 
@@ -12,7 +22,7 @@ public class BuilderController : MonoBehaviour {
 
     public SquareType SelectedSquare;
 
-    private bool _Erase;
+    private Tool _Tool;
 
     public UIController UI;
 
@@ -35,12 +45,13 @@ public class BuilderController : MonoBehaviour {
         }
 
         _BuildSquares = new List<GameObject>();
+        _Tool = Tool.Select;
         SelectedSquare = SquareType.Green;
 
         UI.UpdateSquareCountUI(_Player.Inventory.Squares);
         this.UpdateUIButtons(UI);
 
-        Assemble(_Player.Build.Squares);
+        Assemble(_Player.Build);
 	}
 	
 	private void Update ()
@@ -50,26 +61,48 @@ public class BuilderController : MonoBehaviour {
             Vector3 gridPoint = 
                 GridSnap2D(Camera.main.ScreenToWorldPoint(Input.mousePosition),
                            Game.SquareSize);
-            if (_Erase)
+
+            switch (_Tool)
             {
-                if (_Player.Build.Squares.ContainsKey(gridPoint))
-                {
-                    var color = _Player.Build.Squares[gridPoint];
-                    _Player.Inventory.Squares[color] += 1;
-                    _Player.Build.Squares.Remove(gridPoint);
-                }
-            }
-            else if (_Player.Inventory.Squares[SelectedSquare] > 0 &&
-                (IsNextToSquare(gridPoint) | _Player.Build.Squares.Count == 0))
-            {
-                _Player.Build.Squares[gridPoint] = SelectedSquare;
-                _Player.Inventory.Squares[SelectedSquare] -= 1;
+                case (Tool.Erase):
+                    if (_Player.Build.Squares.ContainsKey(gridPoint))
+                    {
+                        var color = _Player.Build.Squares[gridPoint];
+                        _Player.Inventory.Squares[color] += 1;
+                        _Player.Build.Squares.Remove(gridPoint);
+                    }
+                    break;
+                case (Tool.Select):
+                    if (_Player.Inventory.Squares[SelectedSquare] > 0 &
+                        !_Player.Build.Squares.ContainsKey(gridPoint) &
+                        (IsNextToSquare(gridPoint) | _Player.Build.Squares.Count == 0))
+                    {
+                        _Player.Build.Squares[gridPoint] = SelectedSquare;
+                        _Player.Inventory.Squares[SelectedSquare] -= 1;
+                    }
+                    break;
+                case (Tool.Rotate):
+                    if (_Player.Build.Squares.ContainsKey(gridPoint))
+                    {
+                        _Player.Build.Rotations[gridPoint] = 
+                            _Player.Build.Rotations.ContainsKey(gridPoint) ?
+                            Rotate2D(_Player.Build.Rotations[gridPoint], 90) :
+                            Rotate2D(Quaternion.identity, 90);
+                    }
+                    break;
+                case(Tool.Assign):
+                    if (_Player.Build.Squares.ContainsKey(gridPoint) &&
+                        _Player.Build.Squares[gridPoint] == SquareType.Blue)
+                    {
+                        StartCoroutine(MapKeyFromUser(gridPoint));
+                    }
+                    break;
             }
 
             UI.UpdateSquareCountUI(_Player.Inventory.Squares);
             this.UpdateUIButtons(UI);
             Dismantle();
-            Assemble(_Player.Build.Squares);
+            Assemble(_Player.Build);
         }
         if (Input.GetKeyDown(KeyCode.T))
         {
@@ -96,13 +129,16 @@ public class BuilderController : MonoBehaviour {
         }
     }
 
-    private void Assemble(Dictionary<Vector3, SquareType> squares)
+    private void Assemble(Build build)
     {
-        foreach (var item in squares)
+        foreach (var item in build.Squares)
         {
+            var rotation = build.Rotations.ContainsKey(item.Key) ?
+                                build.Rotations[item.Key] :
+                                Quaternion.identity;
             var square = Instantiate(BuildSquarePrefab,
                                     item.Key * Game.SquareSize,
-                                    Quaternion.identity);
+                                     rotation);
             square.GetComponent<SpriteRenderer>().color = Game.GetColor(item.Value);
             _BuildSquares.Add(square);
         }
@@ -132,18 +168,62 @@ public class BuilderController : MonoBehaviour {
         foreach(var squareCount in uI.SquareCounts)
         {
             var button = squareCount.Value.GetComponent<Button>();
+            button.onClick.RemoveAllListeners();
             button.onClick.AddListener(delegate { SelectSquare(squareCount.Key); });
         }
     }
 
-    public void SetErase(bool value)
+    public void SetErase()
     {
-        _Erase = value;
+        _Tool = Tool.Erase;
+    }
+
+    public void SetRotate()
+    {
+        _Tool = Tool.Rotate;
+    }
+
+    public void SetAssign()
+    {
+        _Tool = Tool.Assign;
     }
 
     public void SelectSquare(SquareType color)
     {
+        _Tool = Tool.Select;
         SelectedSquare = color;
-        SetErase(false);
+    }
+
+    private Quaternion Rotate2D(Quaternion q, int a)
+    {
+        var eulers = q.eulerAngles;
+        eulers.z += a;
+        q.eulerAngles = eulers;
+        return q;
+    }
+
+    IEnumerator WaitForKeyPress()
+    {
+        while (!Input.anyKeyDown)
+        {
+            Debug.Log("waiting for key");
+            yield return null;
+        }
+    }
+
+    private IEnumerator MapKeyFromUser(Vector3 gridPoint)
+    {
+        while (!Input.anyKeyDown | Input.GetKey(KeyCode.Mouse0))
+        {
+            yield return null;
+        }
+        foreach (KeyCode kcode in Enum.GetValues(typeof(KeyCode)))
+        {
+            if (Input.GetKeyDown(kcode))
+            {
+                _Player.Build.Mappings[gridPoint] = kcode;
+                Debug.Log(kcode);
+            }
+        }
     }
 }

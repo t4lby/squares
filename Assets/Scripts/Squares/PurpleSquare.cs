@@ -15,6 +15,7 @@ public class PurpleSquare : Square
         this.Color = SquareType.Purple;
         this.MinimumTransparency = 0.25f;
         this._Acceleration = 40;
+        this.RegenerationSpeed = 0.1f;
     }
 
     private void FixedUpdate() 
