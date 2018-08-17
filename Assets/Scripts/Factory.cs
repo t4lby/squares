@@ -48,8 +48,14 @@ public class Factory : MonoBehaviour
     {
         if (Time.time > nextSpawn)
         {
-            //SpawnRandomSquareInCircle(Game.Players[0].transform.position, 3, 10, true);
+            SpawnRandomSquareInCircle(Game.Players[0].Position, 3, 10, true);
             nextSpawn = Time.time + spawnDiff;
+        }
+
+        //Manually updates position for all players.
+        foreach (var player in Game.Players)
+        {
+            player.Position = player.GetPosition();
         }
     }
 
@@ -96,9 +102,11 @@ public class Factory : MonoBehaviour
     /// </summary>
     private Player SpawnPlayer(Build build, Inventory inventory, Vector3 position)
     {
-        var player = Instantiate(PlayerPrefab).AddComponent<Player>();
+        var player = new Player
+        {
+            Inventory = inventory
+        };
 
-        player.Inventory = inventory;
 
         foreach (var buildPair in build.Squares)
         {
@@ -122,7 +130,14 @@ public class Factory : MonoBehaviour
 
         foreach (var square in player.Squares)
         {
-            FixSquare(square.Value, player);
+            foreach (var direction in Game.Directions)
+            {
+                if (player.Squares.ContainsKey(square.Key + direction))
+                {
+                    FixSquares(square.Value,
+                               player.Squares[square.Key + direction]);
+                }
+            }
         }
         player.UI = CreateUI();
         player.UI.UpdateSquareCountUI(inventory.Squares);
@@ -149,12 +164,6 @@ public class Factory : MonoBehaviour
         joint.connectedBody = squareB.gameObject.GetComponent<Rigidbody2D>();
     }
 
-    private void FixSquare(Square square, Player player)
-    {
-        var joint = square.gameObject.AddComponent<FixedJoint2D>();
-        joint.connectedBody = player.gameObject.GetComponent<Rigidbody2D>();
-    }
-
     /// <summary>
     /// Spawns death particles of a given color in a given location. To be
     /// called on square destruction.
@@ -175,7 +184,7 @@ public class Factory : MonoBehaviour
     private GameObject SpawnCamera(Player target)
     {
         var cam = Instantiate(CameraPrefab);
-        cam.GetComponent<CameraFollowTarget>().Target = target.transform;
+        cam.GetComponent<CameraFollowTarget>().Target = target;
         return cam;
     }
 

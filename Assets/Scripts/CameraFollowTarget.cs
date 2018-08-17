@@ -13,7 +13,7 @@ public class CameraFollowTarget : MonoBehaviour {
 	private void LateUpdate ()
     {
         transform.position = Vector3.Lerp(transform.position,
-                                          Target.GetPosition() + Offset,
+                                          Target.Position + Offset,
                                           SmoothSpeed);
 	}
 }

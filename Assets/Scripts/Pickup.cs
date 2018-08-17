@@ -24,7 +24,7 @@ public class Pickup : MonoBehaviour {
         var rB = this.GetComponent<Rigidbody2D>();
         foreach(Player player in Game.Players)
         {
-            var diff = player.GetPosition() - this.transform.position;
+            var diff = player.Position - this.transform.position;
             rB.AddForce(diff / Mathf.Pow(diff.magnitude, 2));
         }
     }

@@ -20,6 +20,11 @@ public class Player
     public Build Build { get; set; }
 
     /// <summary>
+    /// Gets or sets the position.
+    /// </summary>
+    public Vector3 Position { get; set; }
+
+    /// <summary>
     /// The square objects themselves.
     /// </summary>
     public Dictionary<Vector3,Square> Squares { get; set; }
@@ -73,10 +78,5 @@ public class Player
             this.Squares.Remove(pair.Key);
             this.Build.RemoveFromAll(pair.Key);
         }
-    }
-
-    private void Update()
-    {
-        //this.transform.position = this.GetPosition();
     }
 }
