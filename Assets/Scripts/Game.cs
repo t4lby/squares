@@ -21,6 +21,14 @@ public static class Game
         SquareType.Purple
     };
 
+    public static Vector3[] Directions =
+    {
+        Vector3.up,
+        Vector3.down,
+        Vector3.left,
+        Vector3.right
+    };  
+
 
 
     /*-----------------------------------------------------------------------

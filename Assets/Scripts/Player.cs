@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Xml.Schema;
 using System.Runtime.InteropServices;
+using System.Linq;
 
 public class Player
 {
@@ -43,5 +44,39 @@ public class Player
             total += pair.Value.transform.position;
         }
         return total / Squares.Count;
+    }
+
+    public void DropSmallestComponents()
+    {
+        Algorithms.Tarjan(this.Build);
+        Dictionary<int, int> count = new Dictionary<int, int>();
+        foreach (var pair in this.Build.Components)
+        {
+            count[pair.Value] = count.ContainsKey(pair.Value) ?
+                                     count[pair.Value] + 1 : 1;
+        }
+        if (count.Count == 1)
+        {
+            return;
+        }
+        var largest = 0;
+        foreach (var pair in count)
+        {
+            if (pair.Value > count[largest])
+            {
+                largest = pair.Key;
+            }
+        }
+        var toDrop = this.Build.Components.Where((pair) => pair.Value != largest);
+        foreach (var pair in toDrop)
+        {
+            this.Squares.Remove(pair.Key);
+            this.Build.RemoveFromAll(pair.Key);
+        }
+    }
+
+    private void Update()
+    {
+        //this.transform.position = this.GetPosition();
     }
 }
