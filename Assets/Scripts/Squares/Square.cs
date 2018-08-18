@@ -106,7 +106,8 @@ public abstract class Square : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Square") & !this.Invincible)
+        if (collision.gameObject.CompareTag("Square") & !this.Invincible &&
+            (this.Player == null | collision.gameObject.GetComponent<Square>().Player == null))
         {
             this.Health -= collision.relativeVelocity.magnitude / this.Durability;
             this.UpdateTransparency();
