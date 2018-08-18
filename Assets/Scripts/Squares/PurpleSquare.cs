@@ -27,7 +27,7 @@ public class PurpleSquare : Square
                                              Mathf.Cos(angle),
                                              0);
 
-            this.GetComponent<Rigidbody2D>()
+            this.GetComponent<Rigidbody>()
                 .AddForce(boostDirection * _Acceleration);
             if (Particles != null)
             {

@@ -7,7 +7,6 @@ using System.Collections.Generic;
 /// </summary>
 public class Factory : MonoBehaviour
 {
-    public GameObject PlayerPrefab;
     public GameObject SquarePrefab;
     public GameObject DeathParticlesPrefab;
     public GameObject PickupPrefab;
@@ -67,7 +66,7 @@ public class Factory : MonoBehaviour
         var squareObject = Instantiate(SquarePrefab, position, rotation);
         var squareScript = AttachSquare(color, squareObject);
         squareScript.Factory = this;
-        squareObject.GetComponent<Rigidbody2D>().velocity = velocity;
+        squareObject.GetComponent<Rigidbody>().velocity = velocity;
         return squareScript;
     }
 
@@ -160,8 +159,10 @@ public class Factory : MonoBehaviour
     /// </summary>
     private void FixSquares(Square squareA, Square squareB)
     {
-        var joint = squareA.gameObject.AddComponent<FixedJoint2D>();
-        joint.connectedBody = squareB.gameObject.GetComponent<Rigidbody2D>();
+        var joint = squareA.gameObject.AddComponent<FixedJoint>();
+        joint.enablePreprocessing = false;
+        joint.enableCollision = false;
+        joint.connectedBody = squareB.gameObject.GetComponent<Rigidbody>();
     }
 
     /// <summary>
@@ -211,7 +212,7 @@ public class Factory : MonoBehaviour
         var pickupScript = pickupObject.AddComponent<Pickup>();
         pickupScript.Type = color;
         pickupObject.GetComponent<SpriteRenderer>().color = Game.GetColor(color);
-        pickupObject.GetComponent<Rigidbody2D>().velocity = velocity;
+        pickupObject.GetComponent<Rigidbody>().velocity = velocity;
         return pickupScript;
     }
 
@@ -219,15 +220,15 @@ public class Factory : MonoBehaviour
     {
         this.SpawnDeathParticles(square.transform.position, square.Color);
         this.SpawnPickup(square.transform.position,
-                         square.GetComponent<Rigidbody2D>().velocity,
+                         square.GetComponent<Rigidbody>().velocity,
                          square.Color);
 
         //remove joints
-        foreach (var joint in square.GetComponents<HingeJoint2D>())
+        foreach (var joint in square.GetComponents<FixedJoint>())
         {
-            foreach (var otherJoint in joint.connectedBody.GetComponents<HingeJoint2D>())
+            foreach (var otherJoint in joint.connectedBody.GetComponents<FixedJoint>())
             {
-                if (otherJoint.connectedBody == square.GetComponent<Rigidbody2D>())
+                if (otherJoint.connectedBody == square.GetComponent<Rigidbody>())
                 {
                     Destroy(otherJoint);
                 }

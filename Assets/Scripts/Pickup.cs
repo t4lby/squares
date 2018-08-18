@@ -21,7 +21,7 @@ public class Pickup : MonoBehaviour {
     /// </summary>
     private void GravitateTowardsPlayers()
     {
-        var rB = this.GetComponent<Rigidbody2D>();
+        var rB = this.GetComponent<Rigidbody>();
         foreach(Player player in Game.Players)
         {
             var diff = player.Position - this.transform.position;

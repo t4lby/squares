@@ -104,7 +104,7 @@ public abstract class Square : MonoBehaviour
         this.GetComponent<SpriteRenderer>().color = Game.GetColor(this.Color);
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Square") & !this.Invincible)
         {
