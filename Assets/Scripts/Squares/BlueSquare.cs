@@ -45,11 +45,11 @@ public class BlueSquare : Square
 
     private void ProcessTriggers()
     {
-        if (Input.GetKeyDown(Mapping))
+        if (Input.GetKey(Mapping))
         {
             SetTriggerSurrounding(true);
         }
-        if (Input.GetKeyUp(Mapping))
+        else
         {
             SetTriggerSurrounding(false);
         }

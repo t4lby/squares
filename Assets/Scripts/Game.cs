@@ -18,7 +18,8 @@ public static class Game
     { 
         SquareType.Green,
         SquareType.Blue,
-        SquareType.Purple
+        SquareType.Purple,
+        SquareType.Yellow
     };
 
     public static Vector3[] Directions =

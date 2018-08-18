@@ -13,6 +13,7 @@ public class Factory : MonoBehaviour
     public GameObject UIPrefab;
     public GameObject CameraPrefab;
     public GameObject BoostParticlesPrefab;
+    public GameObject BulletPrefab;
 
     private void Start()
     {
@@ -83,6 +84,8 @@ public class Factory : MonoBehaviour
                 return square.AddComponent<WhiteSquare>();
             case SquareType.Blue:
                 return square.AddComponent<BlueSquare>();
+            case SquareType.Yellow:
+                return square.AddComponent<YellowSquare>();
             case SquareType.Purple:
                 var purple = square.AddComponent<PurpleSquare>();
                 purple.Particles = SpawnBoostParticles(purple.gameObject.transform,
@@ -245,6 +248,12 @@ public class Factory : MonoBehaviour
             square.Player.DropSmallestComponents();
         }
         Destroy(square.gameObject);
+    }
+
+    public void SpawnBullet(Vector3 position, Vector3 velocity)
+    {
+        var bulletObject = Instantiate(BulletPrefab, position, Quaternion.identity);
+        bulletObject.GetComponent<Rigidbody>().velocity = velocity;
     }
 
     private void SpawnRandomSquareInCircle(Vector3 centre, float minRadius, float maxRadius, bool randomRotation)
