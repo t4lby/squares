@@ -7,7 +7,7 @@ public class Pickup : MonoBehaviour {
     /// <summary>
     /// The colour of the Pickup.
     /// </summary>
-    public SquareType Type { get; set; }
+    public SquareType Color { get; set; }
 
 
     private void FixedUpdate()

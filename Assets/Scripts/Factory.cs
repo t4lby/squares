@@ -210,9 +210,10 @@ public class Factory : MonoBehaviour
                                        position,
                                        Quaternion.identity);
         var pickupScript = pickupObject.AddComponent<Pickup>();
-        pickupScript.Type = color;
-        pickupObject.GetComponent<SpriteRenderer>().color = Game.GetColor(color);
-        pickupObject.GetComponent<Rigidbody>().velocity = velocity;
+        pickupScript.Color = color;
+        var main = pickupObject.GetComponent<ParticleSystem>().main;
+        main.startColor = Game.GetColor(color);
+
         return pickupScript;
     }
 

@@ -120,7 +120,7 @@ public abstract class Square : MonoBehaviour
 
         if (collision.gameObject.CompareTag("Pickup") & this.Player != null)
         {
-            var color = collision.gameObject.GetComponent<Pickup>().Type;
+            var color = collision.gameObject.GetComponent<Pickup>().Color;
             this.Player.PickupSquare(color);
             Destroy(collision.gameObject);
         }
