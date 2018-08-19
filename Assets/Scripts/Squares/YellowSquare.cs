@@ -18,11 +18,13 @@ public class YellowSquare : Square
 
     private void Update()
     {
-        if (Triggered)
+        if (Triggered &&
+            this.Player != null &&
+            !this.Player.Squares.ContainsKey(this.PositionInPlayer + Vector3.up))
         {
             var angle = this.transform.rotation.eulerAngles.z * Mathf.PI / 180;
-            var bulletDirection = new Vector3(Mathf.Sin(angle),
-                                             -Mathf.Cos(angle),
+            var bulletDirection = new Vector3(-Mathf.Sin(angle),
+                                             Mathf.Cos(angle),
                                               0).normalized;
             Factory.SpawnBullet(transform.position + Game.SquareSize * bulletDirection,
                                 bulletDirection * BulletSpeed);

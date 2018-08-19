@@ -38,7 +38,6 @@ public class Build
     {
         this.Squares.Remove(key);
         this.Mappings.Remove(key);
-        this.Components.Remove(key);
         this.Rotations.Remove(key);
     }
 }

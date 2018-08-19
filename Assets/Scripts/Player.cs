@@ -73,10 +73,19 @@ public class Player
             }
         }
         var toDrop = this.Build.Components.Where((pair) => pair.Value != largest);
+        var toKeep = this.Build.Components.Where((pair) => pair.Value == largest);
         foreach (var pair in toDrop)
         {
+            this.Squares[pair.Key].Player = null;
             this.Squares.Remove(pair.Key);
             this.Build.RemoveFromAll(pair.Key);
+        }
+        if (toDrop.Count() > 0)
+        {
+            foreach (var pair in toKeep)
+            {
+                this.Squares[pair.Key].Triggered = false;
+            }
         }
     }
 }
