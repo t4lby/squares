@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Pickup
   - Square
+  - Bullet
   layers:
   - Default
   - TransparentFX

@@ -250,10 +250,11 @@ public class Factory : MonoBehaviour
         Destroy(square.gameObject);
     }
 
-    public void SpawnBullet(Vector3 position, Vector3 velocity)
+    public Bullet SpawnBullet(Vector3 position, Vector3 velocity)
     {
         var bulletObject = Instantiate(BulletPrefab, position, Quaternion.identity);
         bulletObject.GetComponent<Rigidbody>().velocity = velocity;
+        return bulletObject.AddComponent<Bullet>();
     }
 
     private void SpawnRandomSquareInCircle(Vector3 centre, float minRadius, float maxRadius, bool randomRotation)
