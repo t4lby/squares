@@ -120,11 +120,6 @@ public abstract class Square : MonoBehaviour
         {
             this.Health -= collision.relativeVelocity.magnitude / this.Durability;
             this.UpdateTransparency();
-
-            if (Health < 0)
-            {
-                Factory.DestroySquare(this);
-            }
         }
 
         if (collision.gameObject.CompareTag("Pickup") & this.Player != null)
@@ -132,6 +127,25 @@ public abstract class Square : MonoBehaviour
             var color = collision.gameObject.GetComponent<Pickup>().Color;
             this.Player.PickupSquare(color);
             Destroy(collision.gameObject);
+        }
+
+        if (Health < 0)
+        {
+            Factory.DestroySquare(this);
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.CompareTag("Fire"))
+        {
+            this.Health -= Time.deltaTime * Game.FireDamage / Durability;
+            this.UpdateTransparency();
+        }
+
+        if (Health < 0)
+        {
+            Factory.DestroySquare(this);
         }
     }
 }

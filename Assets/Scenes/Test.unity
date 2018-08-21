@@ -151,6 +151,8 @@ MonoBehaviour:
     type: 2}
   BoostParticlesPrefab: {fileID: 1477971608935844, guid: 5c4418068c9244a41baacd54e4e06f1d,
     type: 2}
+  FireParticlesPrefab: {fileID: 1830655190239408, guid: 1bcee487bfeb34b389a71cb84b70e750,
+    type: 2}
   BulletPrefab: {fileID: 1313134125271470, guid: 9b37d5034d5044b8bbf186190b0f0c4f,
     type: 2}
 --- !u!4 &430473194

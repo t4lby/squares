@@ -13,19 +13,30 @@ public class Factory : MonoBehaviour
     public GameObject UIPrefab;
     public GameObject CameraPrefab;
     public GameObject BoostParticlesPrefab;
+    public GameObject FireParticlesPrefab;
     public GameObject BulletPrefab;
 
     private void Start()
     {
-        
+
         if (Game.Players.Count == 0)
         {
             var inv = new Inventory();
             inv.Squares[SquareType.Purple] = 50;
             inv.Squares[SquareType.Blue] = 20;
-            inv.Squares[SquareType.Green] = 10;
+            inv.Squares[SquareType.Yellow] = 10;
+            inv.Squares[SquareType.Red] = 10;
             var build = new Build();
             build.Squares[Vector3.zero] = SquareType.White;
+            build.Squares[Vector3.up] = SquareType.Blue;
+            build.Mappings[Vector3.up] = KeyCode.I;
+            build.Squares[Vector3.left] = SquareType.Blue;
+            build.Mappings[Vector3.left] = KeyCode.L;
+            build.Squares[Vector3.right] = SquareType.Blue;
+            build.Mappings[Vector3.right] = KeyCode.J;
+            build.Squares[Vector3.right + Vector3.down] = SquareType.Purple;
+            build.Squares[Vector3.left + Vector3.down] = SquareType.Purple;
+            build.Squares[Vector3.up * 2] = SquareType.Red;
             Game.Players.Add(
                 SpawnPlayer(
                     build,
@@ -44,6 +55,7 @@ public class Factory : MonoBehaviour
     //test stub
     private float nextSpawn;
     private float spawnDiff = 1;
+
     private void Update()
     {
         if (Time.time > nextSpawn)
@@ -91,6 +103,10 @@ public class Factory : MonoBehaviour
                 purple.Particles = SpawnBoostParticles(purple.gameObject.transform,
                                                        SquareType.Purple);
                 return purple;
+            case SquareType.Red:
+                var red = square.AddComponent<RedSquare>();
+                red.Particles = SpawnFireParticles(red.gameObject.transform);
+                return red;
             default:
                 throw new UnityException(message: "Square type not found.");
         }
@@ -198,6 +214,12 @@ public class Factory : MonoBehaviour
                                     parent);
         var main = particles.GetComponent<ParticleSystem>().main;
         main.startColor = Game.GetColor(color);
+        return particles;
+    }
+
+    private GameObject SpawnFireParticles(Transform parent)
+    {
+        var particles = Instantiate(FireParticlesPrefab, parent);
         return particles;
     }
 
