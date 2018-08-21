@@ -250,10 +250,11 @@ public class Factory : MonoBehaviour
         Destroy(square.gameObject);
     }
 
-    public Bullet SpawnBullet(Vector3 position, Vector3 velocity)
+    public Bullet SpawnBullet(Vector3 position, Vector3 force, SquareType color)
     {
         var bulletObject = Instantiate(BulletPrefab, position, Quaternion.identity);
-        bulletObject.GetComponent<Rigidbody>().velocity = velocity;
+        bulletObject.GetComponent<Rigidbody>().AddForce(force);
+        bulletObject.GetComponent<SpriteRenderer>().color = Game.GetColor(color);
         return bulletObject.AddComponent<Bullet>();
     }
 

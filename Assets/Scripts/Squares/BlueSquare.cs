@@ -16,7 +16,7 @@ public class BlueSquare : Square
         this.RegenerationSpeed = 0.5f;
     }
 
-    private void Update()
+    protected override void UpdateSquare()
     {
         if (this.Player != null)
         {

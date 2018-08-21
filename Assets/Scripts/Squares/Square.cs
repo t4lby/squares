@@ -76,6 +76,11 @@ public abstract class Square : MonoBehaviour
     protected abstract void SetSquareProperties();
 
     /// <summary>
+    /// Overridable method for child classes to call update.
+    /// </summary>
+    protected virtual void UpdateSquare(){}
+
+    /// <summary>
     /// Updates the squares transparency based on current health.
     /// </summary>
     protected void UpdateTransparency()
@@ -91,6 +96,8 @@ public abstract class Square : MonoBehaviour
 
     private void Update()
     {
+        UpdateSquare();
+
         if (Regenerates & Health < 1)
         {
             Health += RegenerationSpeed * Time.deltaTime;

@@ -5,7 +5,7 @@ using System.Threading;
 
 public class YellowSquare : Square
 {
-    public float BulletSpeed { get; set; }
+    public float BulletForce { get; set; }
 
     /// <summary>
     /// Tracks if triggered is held.
@@ -19,7 +19,7 @@ public class YellowSquare : Square
         this.Color = SquareType.Yellow;
         this.MinimumTransparency = 0.25f;
         this.RegenerationSpeed = 0.2f;
-        this.BulletSpeed = 40f;
+        this.BulletForce = 1000f;
     }
 
     private void Start()
@@ -27,7 +27,7 @@ public class YellowSquare : Square
         _TriggerHeld = false;
     }
 
-    private void Update()
+    protected override void UpdateSquare()
     {
         if (Triggered &&
             _TriggerHeld == false &&
@@ -39,7 +39,8 @@ public class YellowSquare : Square
                                              Mathf.Cos(angle),
                                               0).normalized;
             Factory.SpawnBullet(transform.position + Game.SquareSize * bulletDirection,
-                                bulletDirection * BulletSpeed);
+                                bulletDirection * BulletForce, this.Color);
+            this.GetComponent<Rigidbody>().AddForce(-bulletDirection * BulletForce);
             _TriggerHeld = true;
         }
 

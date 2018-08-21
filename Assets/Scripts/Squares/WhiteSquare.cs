@@ -27,7 +27,7 @@ public class WhiteSquare : Square
         this.Acceleration = 20;
     }
 
-    private void Update()
+    protected override void UpdateSquare()
     {
         _xInput = Input.GetAxis("Horizontal");
         _yInput = Input.GetAxis("Vertical");
