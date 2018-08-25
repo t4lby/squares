@@ -14,6 +14,7 @@ public static class Game
     public static Dictionary<Vector3, SquareType> PlayerBuild = new Dictionary<Vector3, SquareType>();
     public static Dictionary<SquareType, int> PlayerInventory;
     public static UIController UI;
+    public static Factory Factory;
 
     public static List<SquareType> ActiveSquareTypes = new List<SquareType>
     { 

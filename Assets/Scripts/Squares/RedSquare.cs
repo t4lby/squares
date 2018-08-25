@@ -20,11 +20,6 @@ public class RedSquare : Square
     {
         if (Triggered)
         {
-            var angle = this.transform.rotation.eulerAngles.z * Mathf.PI / 180;
-            var fireDirection = new Vector3(-Mathf.Sin(angle),
-                                             Mathf.Cos(angle),
-                                             0);
-            
             if (Particles != null)
             {
                 Particles.SetActive(true);

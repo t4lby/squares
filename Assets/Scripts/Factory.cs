@@ -16,10 +16,16 @@ public class Factory : MonoBehaviour
     public GameObject FireParticlesPrefab;
     public GameObject BulletPrefab;
 
+    private void Awake()
+    {
+        Game.Factory = this;
+    }
+
     private void Start()
     {
+        
 
-        if (Game.Players.Count == 0)
+        /*if (Game.Players.Count == 0)
         {
             var inv = new Inventory();
             inv.Squares[SquareType.Purple] = 50;
@@ -36,7 +42,7 @@ public class Factory : MonoBehaviour
             build.Mappings[Vector3.right] = KeyCode.J;
             build.Squares[Vector3.right + Vector3.down] = SquareType.Purple;
             build.Squares[Vector3.left + Vector3.down] = SquareType.Purple;
-            build.Squares[Vector3.up * 2] = SquareType.Red;
+            build.Squares[Vector3.up * 2] = SquareType.Yellow;
             Game.Players.Add(
                 SpawnPlayer(
                     build,
@@ -49,20 +55,20 @@ public class Factory : MonoBehaviour
                 Game.Players[0].Build,
                 Game.Players[0].Inventory,
                 Vector3.zero);
-        }
+        }*/
     }
 
     //test stub
-    private float nextSpawn;
-    private float spawnDiff = 1;
+    //private float nextSpawn;
+    //private float spawnDiff = 1;
 
     private void Update()
     {
-        if (Time.time > nextSpawn)
+        /*if (Time.time > nextSpawn)
         {
             SpawnRandomSquareInCircle(Game.Players[0].Position, 3, 10, true);
             nextSpawn = Time.time + spawnDiff;
-        }
+        }*/
 
         //Manually updates position for all players.
         foreach (var player in Game.Players)
@@ -118,7 +124,7 @@ public class Factory : MonoBehaviour
     /// 
     /// Fixed joints are put in on squares that are next to one another.
     /// </summary>
-    private Player SpawnPlayer(Build build, Inventory inventory, Vector3 position)
+    public Player SpawnPlayer(Build build, Inventory inventory, Vector3 position)
     {
         var player = new Player
         {
