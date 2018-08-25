@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEditor;
+using UnityEngine.Networking;
 
-public abstract class Square : MonoBehaviour
+public abstract class Square : NetworkBehaviour
 {
     /// <summary>
     /// The health of the square. from 0 to 1.
@@ -50,6 +51,8 @@ public abstract class Square : MonoBehaviour
     /// The key for this square in the players build.
     /// </summary>
     public Vector3 PositionInPlayer { get; set; }
+
+    public bool IsLocalPlayerSquare { get; set; }
 
     /// <summary>
     /// The factory responsible for the creation of this object.

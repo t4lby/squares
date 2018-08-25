@@ -29,12 +29,20 @@ public class WhiteSquare : Square
 
     protected override void UpdateSquare()
     {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
         _xInput = Input.GetAxis("Horizontal");
         _yInput = Input.GetAxis("Vertical");
     }
 
     private void FixedUpdate()
     {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
         this.GetComponent<Rigidbody>()
             .AddForce(new Vector3(_xInput, _yInput) * Acceleration);
     }

@@ -169,10 +169,10 @@ MonoBehaviour:
     type: 2}
   m_AutoCreatePlayer: 1
   m_PlayerSpawnMethod: 0
-  m_OfflineScene: Editor
+  m_OfflineScene: 
   m_OnlineScene: Test
   m_SpawnPrefabs:
-  - {fileID: 1011911792794042, guid: d30443d1d8e754c759f524c3b9e589b9, type: 2}
+  - {fileID: 0}
   m_CustomConfig: 0
   m_MaxConnections: 4
   m_ConnectionConfig:

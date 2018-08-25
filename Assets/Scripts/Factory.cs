@@ -124,7 +124,7 @@ public class Factory : MonoBehaviour
     /// 
     /// Fixed joints are put in on squares that are next to one another.
     /// </summary>
-    public Player SpawnPlayer(Build build, Inventory inventory, Vector3 position)
+    public Player SpawnPlayer(Build build, Inventory inventory, Vector3 position, bool isLocal = false)
     {
         var player = new Player
         {
@@ -144,6 +144,7 @@ public class Factory : MonoBehaviour
             player.Squares[buildPair.Key].Player = player;
             player.Squares[buildPair.Key].Regenerates = true;
             player.Squares[buildPair.Key].PositionInPlayer = buildPair.Key;
+            player.Squares[buildPair.Key].IsLocalPlayerSquare = isLocal;
             if (build.Mappings.ContainsKey(buildPair.Key))
             {
                 player.Squares[buildPair.Key].Mapped = true;

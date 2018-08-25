@@ -45,7 +45,7 @@ public class BlueSquare : Square
 
     private void ProcessTriggers()
     {
-        if (Input.GetKey(Mapping))
+        if (Input.GetKey(Mapping) && IsLocalPlayerSquare)
         {
             SetTriggerSurrounding(true);
         }
