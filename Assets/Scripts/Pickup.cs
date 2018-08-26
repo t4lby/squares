@@ -25,7 +25,10 @@ public class Pickup : MonoBehaviour {
         foreach(Player player in Game.Players)
         {
             var diff = player.Position - this.transform.position;
-            rB.AddForce(diff / Mathf.Pow(diff.magnitude, 2));
+            if (diff != Vector3.zero)
+            {
+                rB.AddForce(diff / Mathf.Pow(diff.magnitude, 2));
+            }
         }
     }
 }

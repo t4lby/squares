@@ -39,10 +39,6 @@ public class WhiteSquare : Square
 
     private void FixedUpdate()
     {
-        if (!isLocalPlayer)
-        {
-            return;
-        }
         this.GetComponent<Rigidbody>()
             .AddForce(new Vector3(_xInput, _yInput) * Acceleration);
     }

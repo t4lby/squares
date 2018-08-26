@@ -164,9 +164,12 @@ public class Factory : MonoBehaviour
                 }
             }
         }
-        player.UI = CreateUI();
-        player.UI.UpdateSquareCountUI(inventory.Squares);
-        SpawnCamera(player);
+        if(isLocal)
+        {
+            player.UI = CreateUI();
+            player.UI.UpdateSquareCountUI(inventory.Squares);
+            SpawnCamera(player);
+        }
         player.Build = build;
         player.DropSmallestComponents();
         return player;

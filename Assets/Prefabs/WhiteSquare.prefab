@@ -24,8 +24,9 @@ GameObject:
   - component: {fileID: 65908489966777874}
   - component: {fileID: 114073291992284248}
   - component: {fileID: 114393388715602838}
+  - component: {fileID: 114377057200616022}
   m_Layer: 0
-  m_Name: Square
+  m_Name: WhiteSquare
   m_TagString: Square
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -85,24 +86,35 @@ MonoBehaviour:
   m_SceneId:
     m_Value: 0
   m_AssetId:
-    i0: 195
-    i1: 113
-    i2: 139
-    i3: 121
-    i4: 207
-    i5: 181
-    i6: 132
-    i7: 184
-    i8: 201
-    i9: 204
+    i0: 255
+    i1: 17
+    i2: 60
+    i3: 180
+    i4: 106
+    i5: 48
+    i6: 68
+    i7: 88
+    i8: 123
+    i9: 143
     i10: 4
-    i11: 237
-    i12: 63
-    i13: 145
-    i14: 37
-    i15: 119
+    i11: 217
+    i12: 98
+    i13: 126
+    i14: 191
+    i15: 114
   m_ServerOnly: 0
   m_LocalPlayerAuthority: 1
+--- !u!114 &114377057200616022
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1313134125271470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc9daa891870449bf8a5759cda75a464, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114393388715602838
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -114,15 +126,15 @@ MonoBehaviour:
   m_Script: {fileID: -1768714887, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_TransformSyncMode: 1
+  m_TransformSyncMode: 3
   m_SendInterval: 0.1
   m_SyncRotationAxis: 7
   m_RotationSyncCompression: 0
   m_SyncSpin: 0
   m_MovementTheshold: 0.001
   m_VelocityThreshold: 0.0001
-  m_SnapThreshold: 5
-  m_InterpolateRotation: 1
+  m_SnapThreshold: 0.1
+  m_InterpolateRotation: 8
   m_InterpolateMovement: 1
 --- !u!212 &212654686767263132
 SpriteRenderer:

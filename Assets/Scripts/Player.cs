@@ -32,8 +32,10 @@ public class Player
     public void PickupSquare(SquareType color)
     {
         Inventory.Squares[color] += 1;
-
-        UI.UpdateSquareCountUI(Inventory.Squares);
+        if (UI != null)
+        {
+            UI.UpdateSquareCountUI(Inventory.Squares);
+        }
     }
 
     public Player()
@@ -43,6 +45,10 @@ public class Player
 
     public Vector3 GetPosition()
     {
+        if (Squares.Count == 0)
+        {
+            return Vector3.zero;
+        }
         var total = new Vector3();
         foreach (var pair in Squares)
         {
