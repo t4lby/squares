@@ -15,10 +15,10 @@ public class Factory : MonoBehaviour
     public GameObject BoostParticlesPrefab;
     public GameObject FireParticlesPrefab;
     public GameObject BulletPrefab;
+    public GameObject BuilderPrefab;
 
     private void Start()
     {
-
         if (Game.Players.Count == 0)
         {
             var inv = new Inventory();
@@ -71,7 +71,7 @@ public class Factory : MonoBehaviour
         }
     }
 
-    private Square SpawnSquare(SquareType color,
+    public Square SpawnSquare(SquareType color,
                                Vector3 position,
                                Vector3 velocity,
                                Quaternion rotation)
@@ -157,11 +157,14 @@ public class Factory : MonoBehaviour
                 }
             }
         }
-        player.UI = CreateUI();
-        player.UI.UpdateSquareCountUI(inventory.Squares);
-        SpawnCamera(player);
         player.Build = build;
         player.DropSmallestComponents();
+        player.UI = CreateUI();
+        player.UI.UpdateSquareCountUI(inventory.Squares);
+        var builder = Instantiate(BuilderPrefab).GetComponent<RealtimeBuilder>();
+        builder.Factory = this;
+        builder.UI = player.UI;
+        SpawnCamera(player);
         return player;
     }
 

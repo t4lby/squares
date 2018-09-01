@@ -10,6 +10,7 @@ using System;
 public enum Tool 
 {
     Select,
+    Build,
     Erase,
     Rotate,
     Assign,
