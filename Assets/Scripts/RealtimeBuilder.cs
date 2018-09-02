@@ -9,9 +9,15 @@ using UnityEngine.UI;
 /// </summary>
 public class RealtimeBuilder : MonoBehaviour {
 
+    private float _SnapThreshold = 0.5f;
+
     public Factory Factory { get; set; }
 
     public SquareType SelectedSquare;
+
+    private Square _BuildSquare;
+
+    private Square _SnappedSquare;
 
     private Tool _Tool;
 
@@ -25,8 +31,24 @@ public class RealtimeBuilder : MonoBehaviour {
         SelectedSquare = SquareType.Green;
     }
 
-    private void Update () {
-        
+    private void Update ()
+    {
+        if (_BuildSquare != null)
+        {
+            if ((_BuildSquare.transform.position - UITools.GetMousePositionInScene()).magnitude > _SnapThreshold)
+            {
+                _BuildSquare.Snapped = false;
+                _BuildSquare.SnapTarget = null;
+                _BuildSquare.transform.parent = null;
+            }
+            if (_BuildSquare.Snapped == false)
+            {
+                _BuildSquare.transform.position = UITools.GetMousePositionInScene();
+            }
+            _BuildSquare.Health = 0.5f + Mathf.Sin(Time.time * 5) / 2;
+            _BuildSquare.UpdateTransparency();
+        }
+
         if (Input.GetMouseButtonDown(0))
         {
             switch (_Tool)
@@ -83,6 +105,16 @@ public class RealtimeBuilder : MonoBehaviour {
     {
         _Tool = Tool.Build;
         SelectedSquare = color;
+        if(_BuildSquare != null)
+        {
+            Destroy(_BuildSquare);
+        }
+        _BuildSquare = Factory.SpawnSquare(SelectedSquare,
+                                           UITools.GetMousePositionInScene(),
+                                           Vector3.zero,
+                                           Quaternion.identity);
+        _BuildSquare.GetComponent<Collider>().isTrigger = true;
+        _BuildSquare.tag = "BuildSquare";
     }
 
     private Quaternion Rotate2D(Quaternion q, int a)
