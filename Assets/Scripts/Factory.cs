@@ -17,6 +17,8 @@ public class Factory : MonoBehaviour
     public GameObject BulletPrefab;
     public GameObject BuilderPrefab;
 
+    public List<Square> SpawnedSquares;
+
     private void Start()
     {
         if (Game.Players.Count == 0)
@@ -80,6 +82,7 @@ public class Factory : MonoBehaviour
         var squareScript = AttachSquare(color, squareObject);
         squareScript.Factory = this;
         squareObject.GetComponent<Rigidbody>().velocity = velocity;
+        SpawnedSquares.Add(squareScript);
         return squareScript;
     }
 
@@ -162,6 +165,7 @@ public class Factory : MonoBehaviour
         player.UI = CreateUI();
         player.UI.UpdateSquareCountUI(inventory.Squares);
         var builder = Instantiate(BuilderPrefab).GetComponent<RealtimeBuilder>();
+        player.Builder = builder;
         builder.Factory = this;
         builder.UI = player.UI;
         SpawnCamera(player);
@@ -179,7 +183,7 @@ public class Factory : MonoBehaviour
     /// Puts a fixed joint from <paramref name="squareA"/> to
     ///  <paramref name="squareB"/>
     /// </summary>
-    private void FixSquares(Square squareA, Square squareB)
+    public void FixSquares(Square squareA, Square squareB)
     {
         var joint = squareA.gameObject.AddComponent<FixedJoint>();
         joint.enablePreprocessing = false;
@@ -272,6 +276,8 @@ public class Factory : MonoBehaviour
             square.Player.Squares.Remove(square.PositionInPlayer);
             square.Player.DropSmallestComponents();
         }
+
+        SpawnedSquares.Remove(square);
         Destroy(square.gameObject);
     }
 

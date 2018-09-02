@@ -14,6 +14,8 @@ public class Player
 
     public Inventory Inventory { get; set; }
 
+    public RealtimeBuilder Builder { get; set; }
+
     /// <summary>
     /// The players build (should correspond to squares)
     /// </summary>

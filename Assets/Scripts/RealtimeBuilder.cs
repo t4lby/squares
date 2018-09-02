@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEditor;
 
 /// <summary>
 /// Uses player input to spawn squares via the factory.
@@ -10,6 +11,10 @@ using UnityEngine.UI;
 public class RealtimeBuilder : MonoBehaviour {
 
     private float _SnapThreshold = 0.5f;
+
+    private Vector3 BuildSquareColliderSize = new Vector3(0.6f,
+                                                          0.6f,
+                                                          1f);
 
     public Factory Factory { get; set; }
 
@@ -24,6 +29,7 @@ public class RealtimeBuilder : MonoBehaviour {
     public UIController UI;
 
     private Player _Player;
+
 
     private void Start()
     {
@@ -56,10 +62,17 @@ public class RealtimeBuilder : MonoBehaviour {
                 case (Tool.Erase):
                     break;
                 case (Tool.Build):
-                    Factory.SpawnSquare(SelectedSquare,
-                        UITools.GetMousePositionInScene(),
-                        Vector3.zero,
-                        Quaternion.identity);
+                    var spawnedSquare = Factory.SpawnSquare(SelectedSquare,
+                                                            _BuildSquare.transform.position,
+                                                            Vector3.zero,
+                                                            _BuildSquare.transform.rotation);
+                    foreach (var square in Factory.SpawnedSquares)
+                    {
+                        if (square.IsJointTarget)
+                        {
+                            Factory.FixSquares(square, spawnedSquare);
+                        }
+                    }
                     break;
                 case (Tool.Rotate):
                     break;
@@ -114,6 +127,7 @@ public class RealtimeBuilder : MonoBehaviour {
                                            Vector3.zero,
                                            Quaternion.identity);
         _BuildSquare.GetComponent<Collider>().isTrigger = true;
+        _BuildSquare.GetComponent<BoxCollider>().size = BuildSquareColliderSize;
         _BuildSquare.tag = "BuildSquare";
     }
 
