@@ -18,7 +18,7 @@ public abstract class Square : MonoBehaviour
     /// <summary>
     /// Indicates whether the square is immune to all damage.
     /// </summary>
-    protected bool Invincible { get; set; }
+    public bool Invincible { get; set; }
 
     /// <summary>
     /// Indicates whether the square regenrates it's health;
@@ -147,7 +147,7 @@ public abstract class Square : MonoBehaviour
             Destroy(collision.gameObject);
         }
 
-        if (Health < 0)
+        if (Health < 0 && !Invincible)
         {
             Factory.DestroySquare(this);
         }

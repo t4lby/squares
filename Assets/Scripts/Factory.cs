@@ -166,6 +166,7 @@ public class Factory : MonoBehaviour
         player.UI.UpdateSquareCountUI(inventory.Squares);
         var builder = Instantiate(BuilderPrefab).GetComponent<RealtimeBuilder>();
         player.Builder = builder;
+        builder.Player = player;
         builder.Factory = this;
         builder.UI = player.UI;
         SpawnCamera(player);

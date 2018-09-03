@@ -4,19 +4,26 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEditor;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// Uses player input to spawn squares via the factory.
 /// </summary>
-public class RealtimeBuilder : MonoBehaviour {
+public class RealtimeBuilder : MonoBehaviour
+{
 
     private float _SnapThreshold = 0.5f;
 
-    private Vector3 BuildSquareColliderSize = new Vector3(0.6f,
+    private Vector3 BuildSquareColliderSize1 = new Vector3(0.6f,
+                                                          0.4f,
+                                                          1f);
+    private Vector3 BuildSquareColliderSize2 = new Vector3(0.4f,
                                                           0.6f,
                                                           1f);
 
     public Factory Factory { get; set; }
+
+    public Player Player { get; set; }
 
     public SquareType SelectedSquare;
 
@@ -27,9 +34,6 @@ public class RealtimeBuilder : MonoBehaviour {
     private Tool _Tool;
 
     public UIController UI;
-
-    private Player _Player;
-
 
     private void Start()
     {
@@ -62,16 +66,12 @@ public class RealtimeBuilder : MonoBehaviour {
                 case (Tool.Erase):
                     break;
                 case (Tool.Build):
-                    var spawnedSquare = Factory.SpawnSquare(SelectedSquare,
-                                                            _BuildSquare.transform.position,
-                                                            Vector3.zero,
-                                                            _BuildSquare.transform.rotation);
-                    foreach (var square in Factory.SpawnedSquares)
+                    if (!IsPointerOverUIObject() &&
+                        Player.Inventory.Squares[SelectedSquare] > 0)
                     {
-                        if (square.IsJointTarget)
-                        {
-                            Factory.FixSquares(square, spawnedSquare);
-                        }
+                        PlaceBuildSquare();
+                        Player.Inventory.Squares[SelectedSquare] -= 1;
+                        UI.UpdateSquareCountUI(Player.Inventory.Squares);
                     }
                     break;
                 case (Tool.Rotate):
@@ -120,14 +120,19 @@ public class RealtimeBuilder : MonoBehaviour {
         SelectedSquare = color;
         if(_BuildSquare != null)
         {
-            Destroy(_BuildSquare);
+            Factory.SpawnedSquares.Remove(_BuildSquare);
+            Destroy(_BuildSquare.gameObject);
         }
         _BuildSquare = Factory.SpawnSquare(SelectedSquare,
                                            UITools.GetMousePositionInScene(),
                                            Vector3.zero,
                                            Quaternion.identity);
         _BuildSquare.GetComponent<Collider>().isTrigger = true;
-        _BuildSquare.GetComponent<BoxCollider>().size = BuildSquareColliderSize;
+        _BuildSquare.GetComponent<BoxCollider>().size = BuildSquareColliderSize1;
+        var collider2 = _BuildSquare.gameObject.AddComponent<BoxCollider>();
+        collider2.size = BuildSquareColliderSize2;
+        collider2.isTrigger = true;
+        _BuildSquare.Invincible = true;
         _BuildSquare.tag = "BuildSquare";
     }
 
@@ -148,19 +153,42 @@ public class RealtimeBuilder : MonoBehaviour {
         }
     }
 
-    private IEnumerator MapKeyFromUser(Vector3 gridPoint)
+    private void PlaceBuildSquare()
     {
-        while (!Input.anyKeyDown | Input.GetKey(KeyCode.Mouse0))
+        var spawnedSquare = Factory.SpawnSquare(SelectedSquare,
+                                                            _BuildSquare.transform.position,
+                                                            Vector3.zero,
+                                                            _BuildSquare.transform.rotation);
+        foreach (var square in Factory.SpawnedSquares)
         {
-            yield return null;
-        }
-        foreach (KeyCode kcode in Enum.GetValues(typeof(KeyCode)))
-        {
-            if (Input.GetKeyDown(kcode))
+            if (square.IsJointTarget)
             {
-                _Player.Build.Mappings[gridPoint] = kcode;
-                Debug.Log(kcode);
+                Factory.FixSquares(square, spawnedSquare);
+                Factory.FixSquares(spawnedSquare, square);
+                if (square.Player != null)
+                {
+                    //may need to fire down chain of interconnected squares in future.
+                    spawnedSquare.Player = square.Player;
+                    spawnedSquare.Regenerates = true;
+                    spawnedSquare.transform.parent = square.transform;
+                    var posInPlayer = square.PositionInPlayer +
+                                    spawnedSquare.transform.localPosition / Game.SquareSize;
+                    spawnedSquare.Player.Squares[posInPlayer] = spawnedSquare;
+                    spawnedSquare.PositionInPlayer = posInPlayer;
+                    spawnedSquare.transform.parent = null;
+                }
             }
         }
+    }
+
+    private bool IsPointerOverUIObject()
+    {
+        var eventDataCurrentPosition = new PointerEventData(EventSystem.current)
+        {
+            position = new Vector2(Input.mousePosition.x, Input.mousePosition.y)
+        };
+        var results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+        return results.Count > 0;
     }
 }
