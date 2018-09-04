@@ -14,16 +14,18 @@ public class RealtimeBuilder : MonoBehaviour
 
     private float _SnapThreshold = 0.5f;
 
-    private Vector3 BuildSquareColliderSize1 = new Vector3(0.6f,
+    private Vector3 BuildSquareColliderSize1 = new Vector3(0.7f,
                                                           0.4f,
                                                           1f);
     private Vector3 BuildSquareColliderSize2 = new Vector3(0.4f,
-                                                          0.6f,
+                                                          0.7f,
                                                           1f);
 
     public Factory Factory { get; set; }
 
     public Player Player { get; set; }
+
+    public List<Square> JointTargets { get; set; }
 
     public SquareType SelectedSquare;
 
@@ -39,6 +41,7 @@ public class RealtimeBuilder : MonoBehaviour
     {
         AddListenersToUI(UI);
         SelectedSquare = SquareType.Green;
+        this.JointTargets = new List<Square>();
     }
 
     private void Update ()
@@ -156,27 +159,24 @@ public class RealtimeBuilder : MonoBehaviour
     private void PlaceBuildSquare()
     {
         var spawnedSquare = Factory.SpawnSquare(SelectedSquare,
-                                                            _BuildSquare.transform.position,
-                                                            Vector3.zero,
-                                                            _BuildSquare.transform.rotation);
-        foreach (var square in Factory.SpawnedSquares)
+                                                _BuildSquare.transform.position,
+                                                Vector3.zero,
+                                                _BuildSquare.transform.rotation);
+        foreach (var square in this.JointTargets)
         {
-            if (square.IsJointTarget)
+            Factory.FixSquares(square, spawnedSquare);
+            Factory.FixSquares(spawnedSquare, square);
+            if (square.Player != null)
             {
-                Factory.FixSquares(square, spawnedSquare);
-                Factory.FixSquares(spawnedSquare, square);
-                if (square.Player != null)
-                {
-                    //may need to fire down chain of interconnected squares in future.
-                    spawnedSquare.Player = square.Player;
-                    spawnedSquare.Regenerates = true;
-                    spawnedSquare.transform.parent = square.transform;
-                    var posInPlayer = square.PositionInPlayer +
-                                    spawnedSquare.transform.localPosition / Game.SquareSize;
-                    spawnedSquare.Player.Squares[posInPlayer] = spawnedSquare;
-                    spawnedSquare.PositionInPlayer = posInPlayer;
-                    spawnedSquare.transform.parent = null;
-                }
+                //may need to fire down chain of interconnected squares in future.
+                spawnedSquare.Player = square.Player;
+                spawnedSquare.Regenerates = true;
+                spawnedSquare.transform.parent = square.transform;
+                var posInPlayer = square.PositionInPlayer +
+                                spawnedSquare.transform.localPosition / Game.SquareSize;
+                spawnedSquare.Player.Squares[posInPlayer] = spawnedSquare;
+                spawnedSquare.PositionInPlayer = posInPlayer;
+                spawnedSquare.transform.parent = null;
             }
         }
     }

@@ -56,7 +56,7 @@ public class Factory : MonoBehaviour
 
     //test stub
     private float nextSpawn;
-    private float spawnDiff = 1;
+    private float spawnDiff = 10;
 
     private void Update()
     {

@@ -85,12 +85,6 @@ public abstract class Square : MonoBehaviour
     /// </summary>
     public Square SnapTarget { get; set; }
 
-    /// <summary>
-    /// Indicates whether the square will be joined to the current build square.
-    /// </summary>
-    /// <value><c>true</c> if is joint target; otherwise, <c>false</c>.</value>
-    public bool IsJointTarget { get; set; }
-
     protected abstract void SetSquareProperties();
 
     /// <summary>
@@ -189,7 +183,7 @@ public abstract class Square : MonoBehaviour
     {
         if (other.CompareTag("BuildSquare"))
         {
-            IsJointTarget = true;
+            Game.Players[0].Builder.JointTargets.Add(this);
         }
     }
 
@@ -197,7 +191,7 @@ public abstract class Square : MonoBehaviour
     {
         if (other.CompareTag("BuildSquare"))
         {
-            IsJointTarget = false;
+            Game.Players[0].Builder.JointTargets.Remove(this);
         }
     }
 }
