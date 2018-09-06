@@ -72,8 +72,10 @@ public class RealtimeBuilder : MonoBehaviour
                     if (!IsPointerOverUIObject() &&
                         Player.Inventory.Squares[SelectedSquare] > 0)
                     {
-                        PlaceBuildSquare();
-                        Player.Inventory.Squares[SelectedSquare] -= 1;
+                        if (PlaceBuildSquare())
+                        {
+                            Player.Inventory.Squares[SelectedSquare] -= 1;
+                        }
                         UI.UpdateSquareCountUI(Player.Inventory.Squares);
                     }
                     break;
@@ -82,7 +84,11 @@ public class RealtimeBuilder : MonoBehaviour
                 case (Tool.Assign):
                     break;
             }
+        }
 
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            JointTargets = new List<Square>();
         }
 	}
 
@@ -156,8 +162,21 @@ public class RealtimeBuilder : MonoBehaviour
         }
     }
 
-    private void PlaceBuildSquare()
+    /// <summary>
+    /// Attempts to place a square where the build square is currently.
+    /// </summary>
+    /// <returns><c>true</c>, if build square was placed, <c>false</c> otherwise.</returns>
+    private bool PlaceBuildSquare()
     {
+        //prevent from building on top of an existing square.
+        foreach (var square in this.JointTargets)
+        {
+            if (square.transform.position == _BuildSquare.transform.position)
+            {
+                //play some sort of sound indicating can't place.
+                return false;
+            }
+        }
         var spawnedSquare = Factory.SpawnSquare(SelectedSquare,
                                                 _BuildSquare.transform.position,
                                                 Vector3.zero,
@@ -172,13 +191,14 @@ public class RealtimeBuilder : MonoBehaviour
                 spawnedSquare.Player = square.Player;
                 spawnedSquare.Regenerates = true;
                 spawnedSquare.transform.parent = square.transform;
-                var posInPlayer = square.PositionInPlayer +
-                                spawnedSquare.transform.localPosition / Game.SquareSize;
+                var posInPlayer = Game.RoundVectorToInt(square.PositionInPlayer +
+                                                        spawnedSquare.transform.localPosition / Game.SquareSize);
                 spawnedSquare.Player.Squares[posInPlayer] = spawnedSquare;
                 spawnedSquare.PositionInPlayer = posInPlayer;
                 spawnedSquare.transform.parent = null;
             }
         }
+        return true;
     }
 
     private bool IsPointerOverUIObject()

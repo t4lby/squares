@@ -149,19 +149,23 @@ public abstract class Square : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if (other.CompareTag("Fire"))
+        if (other.CompareTag("Fire") && !Invincible)
         {
             this.Health -= Time.deltaTime * Game.FireDamage / Durability;
             this.UpdateTransparency();
         }
 
-        if (Health < 0)
+        if (Health < 0 && !Invincible)
         {
             Factory.DestroySquare(this);
         }
 
         if (other.CompareTag("BuildSquare"))
         {
+            if (!Game.Players[0].Builder.JointTargets.Contains(this))
+            {
+                Game.Players[0].Builder.JointTargets.Add(this);
+            }
             var buildSquare = other.GetComponent<Square>();
             buildSquare.Snapped = true;
             if (buildSquare.SnapTarget == null)
@@ -179,19 +183,11 @@ public abstract class Square : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("BuildSquare"))
-        {
-            Game.Players[0].Builder.JointTargets.Add(this);
-        }
-    }
-
     private void OnTriggerExit(Collider other)
     {
         if (other.CompareTag("BuildSquare"))
         {
-            Game.Players[0].Builder.JointTargets.Remove(this);
+            while(Game.Players[0].Builder.JointTargets.Remove(this));
         }
     }
 }
