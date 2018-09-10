@@ -181,32 +181,19 @@ public class RealtimeBuilder : MonoBehaviour
                                                 _BuildSquare.transform.position,
                                                 Vector3.zero,
                                                 _BuildSquare.transform.rotation);
-        var attatchedSquares = new Dictionary<Vector3, Square>();
         foreach (var square in this.JointTargets)
         {
-            square.transform.parent = spawnedSquare.transform;
-            var calculatedLocalPosition = UITools.BestDirection(square.transform.localPosition)
-                                            * Game.SquareSize;
-            square.transform.localPosition = calculatedLocalPosition;
-                      
-            //move square to "best direction position (assuming it's not already taken)
-            //this needs to be nearest 90 degrees.
-            square.transform.rotation = spawnedSquare.transform.rotation;
-            //if it is already taken we simply do not attach it.
-            square.transform.parent = null;
-
-
             Factory.FixSquares(square, spawnedSquare);
             Factory.FixSquares(spawnedSquare, square);
             if (square.Player != null)
             {
-                //may need to fire down chain of interconnected squares in future.
                 spawnedSquare.Player = square.Player;
                 spawnedSquare.Regenerates = true;
                 spawnedSquare.transform.parent = square.transform;
                 var posInPlayer = Game.RoundVectorToInt(square.PositionInPlayer +
                                                         spawnedSquare.transform.localPosition / Game.SquareSize);
                 spawnedSquare.Player.Squares[posInPlayer] = spawnedSquare;
+                spawnedSquare.Player.Build.Squares[posInPlayer] = SelectedSquare;
                 spawnedSquare.PositionInPlayer = posInPlayer;
                 spawnedSquare.transform.parent = null;
             }

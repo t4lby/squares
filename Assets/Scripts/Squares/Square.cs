@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEditor;
+using System.Collections.Generic;
 
 public abstract class Square : MonoBehaviour
 {
@@ -85,6 +86,11 @@ public abstract class Square : MonoBehaviour
     /// </summary>
     public Square SnapTarget { get; set; }
 
+    /// <summary>
+    /// The squares this one is connected to.
+    /// </summary>
+    public List<Square> ConnectedTo { get; set; }
+
     protected abstract void SetSquareProperties();
 
     /// <summary>
@@ -120,6 +126,7 @@ public abstract class Square : MonoBehaviour
     private void Awake()
     {
         this.SetSquareProperties();
+        this.ConnectedTo = new List<Square>();
         this.GetComponent<SpriteRenderer>().color = Game.GetColor(this.Color);
     }
 
@@ -162,10 +169,6 @@ public abstract class Square : MonoBehaviour
 
         if (other.CompareTag("BuildSquare"))
         {
-            if (!Game.Players[0].Builder.JointTargets.Contains(this))
-            {
-                Game.Players[0].Builder.JointTargets.Add(this);
-            }
             var buildSquare = other.GetComponent<Square>();
             buildSquare.Snapped = true;
             if (buildSquare.SnapTarget == null)
@@ -179,6 +182,11 @@ public abstract class Square : MonoBehaviour
                 buildSquare.transform.localPosition =
                                UITools.BestDirection(other.transform.localPosition)
                                * Game.SquareSize;
+            }
+            if (!Game.Players[0].Builder.JointTargets.Contains(this) &&
+                Algorithms.AreInSameComponent(this, buildSquare.SnapTarget))
+            {
+                Game.Players[0].Builder.JointTargets.Add(this);
             }
         }
     }
