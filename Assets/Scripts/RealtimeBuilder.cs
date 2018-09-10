@@ -6,6 +6,15 @@ using UnityEngine.UI;
 using UnityEditor;
 using UnityEngine.EventSystems;
 
+public enum Tool
+{
+    Erase,
+    Rotate,
+    Assign,
+    Select,
+    Build
+}
+
 /// <summary>
 /// Uses player input to spawn squares via the factory.
 /// </summary>
@@ -29,9 +38,13 @@ public class RealtimeBuilder : MonoBehaviour
 
     public SquareType SelectedSquare;
 
+    private float SelectorRadius = 0.025f;
+
     private Square _BuildSquare;
 
-    private Square _SnappedSquare;
+    public GameObject SelectorPrefab;
+
+    private Selector _Selector;
 
     private Tool _Tool;
 
@@ -39,7 +52,10 @@ public class RealtimeBuilder : MonoBehaviour
 
     private void Start()
     {
-        AddListenersToUI(UI);
+        UI.UpdateListeners(SelectSquare,
+                           SetErase,
+                           SetRotate,
+                           SetAssign);
         SelectedSquare = SquareType.Green;
         this.JointTargets = new List<Square>();
     }
@@ -62,15 +78,23 @@ public class RealtimeBuilder : MonoBehaviour
             _BuildSquare.UpdateTransparency();
         }
 
-        if (Input.GetMouseButtonDown(0))
+        if (_Selector != null)
+        {
+            _Selector.transform.position = UITools.GetMousePositionInScene();
+        }
+
+        if (Input.GetMouseButtonDown(0) && !IsPointerOverUIObject())
         {
             switch (_Tool)
             {
                 case (Tool.Erase):
+                    if (_Selector.Target != null)
+                    {
+                        Factory.DestroySquare(_Selector.Target);
+                    }
                     break;
                 case (Tool.Build):
-                    if (!IsPointerOverUIObject() &&
-                        Player.Inventory.Squares[SelectedSquare] > 0)
+                    if (Player.Inventory.Squares[SelectedSquare] > 0)
                     {
                         if (PlaceBuildSquare())
                         {
@@ -82,17 +106,16 @@ public class RealtimeBuilder : MonoBehaviour
                 case (Tool.Rotate):
                     break;
                 case (Tool.Assign):
+                    if (_Selector.Target != null && _Selector.Target.Player != null)
+                    {
+                        StartCoroutine(MapKeyFromUser(_Selector.Target.PositionInPlayer));
+                    }
                     break;
             }
         }
-
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            JointTargets = new List<Square>();
-        }
 	}
 
-    private void AddListenersToUI(UIController uI)
+    private void UpdateUIListeners(UIController uI)
     {
         foreach (var squareCount in uI.SquareCounts)
         {
@@ -101,37 +124,48 @@ public class RealtimeBuilder : MonoBehaviour
             button.onClick.AddListener(delegate { SelectSquare(squareCount.Key); });
         }
         uI.Erase.onClick.RemoveAllListeners();
-        uI.Erase.onClick.AddListener(delegate { SetErase(); });
+        uI.Erase.onClick.AddListener(SetErase);
         uI.Rotate.onClick.RemoveAllListeners();
-        uI.Rotate.onClick.AddListener(delegate { SetRotate(); });
+        uI.Rotate.onClick.AddListener(SetRotate);
         uI.Assign.onClick.RemoveAllListeners();
-        uI.Assign.onClick.AddListener(delegate { SetAssign(); });
+        uI.Assign.onClick.AddListener(SetAssign);
     }
 
     public void SetErase()
     {
+        DestroyBuildSquare();
         _Tool = Tool.Erase;
+        if (_Selector == null)
+        {
+            _Selector = SpawnSelector();
+        }
     }
 
     public void SetRotate()
     {
+        DestroyBuildSquare();
         _Tool = Tool.Rotate;
+        if (_Selector == null)
+        {
+            _Selector = SpawnSelector();
+        }
     }
 
     public void SetAssign()
     {
+        DestroyBuildSquare();
         _Tool = Tool.Assign;
+        if (_Selector == null)
+        {
+            _Selector = SpawnSelector();
+        }
     }
 
     public void SelectSquare(SquareType color)
     {
         _Tool = Tool.Build;
         SelectedSquare = color;
-        if(_BuildSquare != null)
-        {
-            Factory.SpawnedSquares.Remove(_BuildSquare);
-            Destroy(_BuildSquare.gameObject);
-        }
+        DestroyBuildSquare();
         _BuildSquare = Factory.SpawnSquare(SelectedSquare,
                                            UITools.GetMousePositionInScene(),
                                            Vector3.zero,
@@ -145,21 +179,32 @@ public class RealtimeBuilder : MonoBehaviour
         _BuildSquare.tag = "BuildSquare";
     }
 
+    private Selector SpawnSelector()
+    {
+        var selector = Instantiate(SelectorPrefab);
+        selector.name = "Selector";
+        var selectorCollider = selector.AddComponent<SphereCollider>();
+        selectorCollider.radius = SelectorRadius;
+        selectorCollider.isTrigger = true;
+        return selector.AddComponent<Selector>();
+    }
+
+    private void DestroyBuildSquare()
+    {
+        if (_BuildSquare != null)
+        {
+            Factory.SpawnedSquares.Remove(_BuildSquare);
+            Destroy(_BuildSquare.gameObject);
+            _BuildSquare = null;
+        }
+    }
+
     private Quaternion Rotate2D(Quaternion q, int a)
     {
         var eulers = q.eulerAngles;
         eulers.z += a;
         q.eulerAngles = eulers;
         return q;
-    }
-
-    IEnumerator WaitForKeyPress()
-    {
-        while (!Input.anyKeyDown)
-        {
-            Debug.Log("waiting for key");
-            yield return null;
-        }
     }
 
     /// <summary>
@@ -210,5 +255,32 @@ public class RealtimeBuilder : MonoBehaviour
         var results = new List<RaycastResult>();
         EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
         return results.Count > 0;
+    }
+
+    IEnumerator WaitForKeyPress()
+    {
+        while (!Input.anyKeyDown)
+        {
+            Debug.Log("waiting for key");
+            yield return null;
+        }
+    }
+
+    private IEnumerator MapKeyFromUser(Vector3 posInPlayer)
+    {
+        while (!Input.anyKeyDown | Input.GetKey(KeyCode.Mouse0))
+        {
+            yield return null;
+        }
+        foreach (KeyCode kcode in Enum.GetValues(typeof(KeyCode)))
+        {
+            if (Input.GetKeyDown(kcode))
+            {
+                Player.Build.Mappings[posInPlayer] = kcode;
+                Player.Squares[posInPlayer].Mapped = true;
+                Player.Squares[posInPlayer].Mapping = kcode;
+                Debug.Log(kcode);
+            }
+        }
     }
 }
