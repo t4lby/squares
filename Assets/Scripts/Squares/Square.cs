@@ -1,13 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEditor;
+using System.Collections.Generic;
 
 public abstract class Square : MonoBehaviour
 {
     /// <summary>
     /// The health of the square. from 0 to 1.
     /// </summary>
-    protected float Health { get; set; }
+    public float Health { get; set; }
 
     /// <summary>
     /// The squares durability. Responsible for deciding how much health is
@@ -18,7 +19,7 @@ public abstract class Square : MonoBehaviour
     /// <summary>
     /// Indicates whether the square is immune to all damage.
     /// </summary>
-    protected bool Invincible { get; set; }
+    public bool Invincible { get; set; }
 
     /// <summary>
     /// Indicates whether the square regenrates it's health;
@@ -73,6 +74,23 @@ public abstract class Square : MonoBehaviour
     /// </summary>
     public bool Mapped { get; set; }
 
+    /// <summary>
+    /// Flag for builds squares. Indicates whether the build square is currently
+    /// snapped to another square in the scene.
+    /// </summary>
+    /// <value><c>true</c> if snapped; otherwise, <c>false</c>.</value>
+    public bool Snapped { get; set; }
+
+    /// <summary>
+    /// The square that the build square is snapped to.
+    /// </summary>
+    public Square SnapTarget { get; set; }
+
+    /// <summary>
+    /// The squares this one is connected to.
+    /// </summary>
+    public List<Square> ConnectedTo { get; set; }
+
     protected abstract void SetSquareProperties();
 
     /// <summary>
@@ -83,7 +101,7 @@ public abstract class Square : MonoBehaviour
     /// <summary>
     /// Updates the squares transparency based on current health.
     /// </summary>
-    protected void UpdateTransparency()
+    public void UpdateTransparency()
     {
         var spriteRenderer = this.GetComponent<SpriteRenderer>();
         var current = spriteRenderer.color;
@@ -108,6 +126,7 @@ public abstract class Square : MonoBehaviour
     private void Awake()
     {
         this.SetSquareProperties();
+        this.ConnectedTo = new List<Square>();
         this.GetComponent<SpriteRenderer>().color = Game.GetColor(this.Color);
     }
 
@@ -129,7 +148,7 @@ public abstract class Square : MonoBehaviour
             Destroy(collision.gameObject);
         }
 
-        if (Health < 0)
+        if (Health < 0 && !Invincible)
         {
             Factory.DestroySquare(this);
         }
@@ -137,15 +156,46 @@ public abstract class Square : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if (other.CompareTag("Fire"))
+        if (other.CompareTag("Fire") && !Invincible)
         {
             this.Health -= Time.deltaTime * Game.FireDamage / Durability;
             this.UpdateTransparency();
         }
 
-        if (Health < 0)
+        if (Health < 0 && !Invincible)
         {
             Factory.DestroySquare(this);
+        }
+
+        if (other.CompareTag("BuildSquare"))
+        {
+            var buildSquare = other.GetComponent<Square>();
+            buildSquare.Snapped = true;
+            if (buildSquare.SnapTarget == null)
+            {
+                buildSquare.SnapTarget = this;
+            }
+            if (buildSquare.SnapTarget == this)
+            {
+                buildSquare.transform.parent = this.transform;
+                buildSquare.transform.rotation = this.transform.rotation;
+                buildSquare.transform.localPosition =
+                               UITools.BestDirection(other.transform.localPosition)
+                               * Game.SquareSize;
+            }
+            if (!Game.Players[0].Builder.JointTargets.Contains(this) &&
+                Algorithms.AreInSameComponent(this, buildSquare.SnapTarget))
+            {
+                Game.Players[0].Builder.JointTargets.Add(this);
+            }
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("BuildSquare"))
+        {
+            while(Game.Players[0].Builder.JointTargets.Remove(this));
         }
     }
 }

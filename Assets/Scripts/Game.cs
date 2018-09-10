@@ -32,7 +32,13 @@ public static class Game
         Vector3.right
     };  
 
-
+    public static Vector3 RoundVectorToInt(Vector3 input)
+    {
+        var x = Mathf.RoundToInt(input.x);
+        var y = Mathf.RoundToInt(input.y);
+        var z = Mathf.RoundToInt(input.z);
+        return new Vector3(x, y, z);
+    }
 
     /*-----------------------------------------------------------------------
      * Define colors

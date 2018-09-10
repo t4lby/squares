@@ -10,6 +10,9 @@ public class UIController : MonoBehaviour
 {
 
     public GameObject SquareCountPrefab;
+    public Button Erase;
+    public Button Rotate;
+    public Button Assign;
     public Vector3 FirstCountPosition;
     public Vector3 DiffCountPosition;
     public Dictionary<SquareType, GameObject> SquareCounts;

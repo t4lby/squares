@@ -34,5 +34,41 @@ public static class Algorithms
             }
         }
     }
+
+    public static bool AreInSameComponent(Square SquareA, Square SquareB)
+    {
+        if (SquareA == SquareB)
+        {
+            return true;
+        }
+        var toCheck = SquareA.ConnectedTo;
+        var checkedSquares = new List<Square>();
+        while (toCheck.Count > 0)
+        {
+            var stateBeforeCheck = toCheck.ToArray();
+            var toAdd = new List<Square>();
+            foreach (Square s in toCheck)
+            {
+                checkedSquares.Add(s);
+                if (s == SquareB)
+                {
+                    return true;
+                }
+                foreach (var t in s.ConnectedTo)
+                {
+                    if (!checkedSquares.Contains(t))
+                    {
+                        toAdd.Add(t);
+                    }
+                }
+            }
+            toCheck.AddRange(toAdd);
+            foreach (Square t in stateBeforeCheck)
+            {
+                toCheck.Remove(t);
+            }
+        }
+        return false;
+    }
 }
 

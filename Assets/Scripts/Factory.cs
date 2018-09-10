@@ -15,10 +15,12 @@ public class Factory : MonoBehaviour
     public GameObject BoostParticlesPrefab;
     public GameObject FireParticlesPrefab;
     public GameObject BulletPrefab;
+    public GameObject BuilderPrefab;
+
+    public List<Square> SpawnedSquares;
 
     private void Start()
     {
-
         if (Game.Players.Count == 0)
         {
             var inv = new Inventory();
@@ -54,7 +56,7 @@ public class Factory : MonoBehaviour
 
     //test stub
     private float nextSpawn;
-    private float spawnDiff = 1;
+    private float spawnDiff = 10;
 
     private void Update()
     {
@@ -71,7 +73,7 @@ public class Factory : MonoBehaviour
         }
     }
 
-    private Square SpawnSquare(SquareType color,
+    public Square SpawnSquare(SquareType color,
                                Vector3 position,
                                Vector3 velocity,
                                Quaternion rotation)
@@ -80,6 +82,7 @@ public class Factory : MonoBehaviour
         var squareScript = AttachSquare(color, squareObject);
         squareScript.Factory = this;
         squareObject.GetComponent<Rigidbody>().velocity = velocity;
+        SpawnedSquares.Add(squareScript);
         return squareScript;
     }
 
@@ -157,11 +160,16 @@ public class Factory : MonoBehaviour
                 }
             }
         }
-        player.UI = CreateUI();
-        player.UI.UpdateSquareCountUI(inventory.Squares);
-        SpawnCamera(player);
         player.Build = build;
         player.DropSmallestComponents();
+        player.UI = CreateUI();
+        player.UI.UpdateSquareCountUI(inventory.Squares);
+        var builder = Instantiate(BuilderPrefab).GetComponent<RealtimeBuilder>();
+        player.Builder = builder;
+        builder.Player = player;
+        builder.Factory = this;
+        builder.UI = player.UI;
+        SpawnCamera(player);
         return player;
     }
 
@@ -176,12 +184,20 @@ public class Factory : MonoBehaviour
     /// Puts a fixed joint from <paramref name="squareA"/> to
     ///  <paramref name="squareB"/>
     /// </summary>
-    private void FixSquares(Square squareA, Square squareB)
+    public void FixSquares(Square squareA, Square squareB)
     {
         var joint = squareA.gameObject.AddComponent<FixedJoint>();
         joint.enablePreprocessing = false;
         joint.enableCollision = false;
         joint.connectedBody = squareB.gameObject.GetComponent<Rigidbody>();
+        if (!squareA.ConnectedTo.Contains(squareB))
+        {
+            squareA.ConnectedTo.Add(squareB);
+        }
+        if (!squareB.ConnectedTo.Contains(squareA))
+        {
+            squareB.ConnectedTo.Add(squareA);
+        }
     }
 
     /// <summary>
@@ -250,15 +266,16 @@ public class Factory : MonoBehaviour
                          square.Color);
 
         //remove joints
-        foreach (var joint in square.GetComponents<FixedJoint>())
+        foreach (var connectedSquare in square.ConnectedTo)
         {
-            foreach (var otherJoint in joint.connectedBody.GetComponents<FixedJoint>())
+            foreach (var otherJoint in connectedSquare.GetComponents<FixedJoint>())
             {
                 if (otherJoint.connectedBody == square.GetComponent<Rigidbody>())
                 {
                     Destroy(otherJoint);
                 }
             }
+            connectedSquare.ConnectedTo.Remove(square);
         }
 
         if (square.Player != null)
@@ -269,6 +286,8 @@ public class Factory : MonoBehaviour
             square.Player.Squares.Remove(square.PositionInPlayer);
             square.Player.DropSmallestComponents();
         }
+
+        SpawnedSquares.Remove(square);
         Destroy(square.gameObject);
     }
 
