@@ -6,6 +6,15 @@ using UnityEngine.UI;
 using UnityEditor;
 using UnityEngine.EventSystems;
 
+public enum Tool
+{
+    Erase,
+    Rotate,
+    Assign,
+    Select,
+    Build
+}
+
 /// <summary>
 /// Uses player input to spawn squares via the factory.
 /// </summary>
@@ -115,11 +124,11 @@ public class RealtimeBuilder : MonoBehaviour
             button.onClick.AddListener(delegate { SelectSquare(squareCount.Key); });
         }
         uI.Erase.onClick.RemoveAllListeners();
-        uI.Erase.onClick.AddListener(delegate { SetErase(); });
+        uI.Erase.onClick.AddListener(SetErase);
         uI.Rotate.onClick.RemoveAllListeners();
-        uI.Rotate.onClick.AddListener(delegate { SetRotate(); });
+        uI.Rotate.onClick.AddListener(SetRotate);
         uI.Assign.onClick.RemoveAllListeners();
-        uI.Assign.onClick.AddListener(delegate { SetAssign(); });
+        uI.Assign.onClick.AddListener(SetAssign);
     }
 
     public void SetErase()
