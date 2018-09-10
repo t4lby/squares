@@ -29,9 +29,13 @@ public class RealtimeBuilder : MonoBehaviour
 
     public SquareType SelectedSquare;
 
+    private float SelectorRadius = 0.025f;
+
     private Square _BuildSquare;
 
-    private Square _SnappedSquare;
+    public GameObject SelectorPrefab;
+
+    private Selector _Selector;
 
     private Tool _Tool;
 
@@ -62,15 +66,23 @@ public class RealtimeBuilder : MonoBehaviour
             _BuildSquare.UpdateTransparency();
         }
 
-        if (Input.GetMouseButtonDown(0))
+        if (_Selector != null)
+        {
+            _Selector.transform.position = UITools.GetMousePositionInScene();
+        }
+
+        if (Input.GetMouseButtonDown(0) && !IsPointerOverUIObject())
         {
             switch (_Tool)
             {
                 case (Tool.Erase):
+                    if (_Selector.Target != null)
+                    {
+                        Factory.DestroySquare(_Selector.Target);
+                    }
                     break;
                 case (Tool.Build):
-                    if (!IsPointerOverUIObject() &&
-                        Player.Inventory.Squares[SelectedSquare] > 0)
+                    if (Player.Inventory.Squares[SelectedSquare] > 0)
                     {
                         if (PlaceBuildSquare())
                         {
@@ -110,28 +122,39 @@ public class RealtimeBuilder : MonoBehaviour
 
     public void SetErase()
     {
+        DestroyBuildSquare();
         _Tool = Tool.Erase;
+        if (_Selector == null)
+        {
+            _Selector = SpawnSelector();
+        }
     }
 
     public void SetRotate()
     {
+        DestroyBuildSquare();
         _Tool = Tool.Rotate;
+        if (_Selector == null)
+        {
+            _Selector = SpawnSelector();
+        }
     }
 
     public void SetAssign()
     {
+        DestroyBuildSquare();
         _Tool = Tool.Assign;
+        if (_Selector == null)
+        {
+            _Selector = SpawnSelector();
+        }
     }
 
     public void SelectSquare(SquareType color)
     {
         _Tool = Tool.Build;
         SelectedSquare = color;
-        if(_BuildSquare != null)
-        {
-            Factory.SpawnedSquares.Remove(_BuildSquare);
-            Destroy(_BuildSquare.gameObject);
-        }
+        DestroyBuildSquare();
         _BuildSquare = Factory.SpawnSquare(SelectedSquare,
                                            UITools.GetMousePositionInScene(),
                                            Vector3.zero,
@@ -143,6 +166,26 @@ public class RealtimeBuilder : MonoBehaviour
         collider2.isTrigger = true;
         _BuildSquare.Invincible = true;
         _BuildSquare.tag = "BuildSquare";
+    }
+
+    private Selector SpawnSelector()
+    {
+        var selector = Instantiate(SelectorPrefab);
+        selector.name = "Selector";
+        var selectorCollider = selector.AddComponent<SphereCollider>();
+        selectorCollider.radius = SelectorRadius;
+        selectorCollider.isTrigger = true;
+        return selector.AddComponent<Selector>();
+    }
+
+    private void DestroyBuildSquare()
+    {
+        if (_BuildSquare != null)
+        {
+            Factory.SpawnedSquares.Remove(_BuildSquare);
+            Destroy(_BuildSquare.gameObject);
+            _BuildSquare = null;
+        }
     }
 
     private Quaternion Rotate2D(Quaternion q, int a)
