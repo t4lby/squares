@@ -29,8 +29,8 @@ public class Factory : MonoBehaviour
             inv.Squares[SquareType.Yellow] = 10;
             inv.Squares[SquareType.Red] = 10;*/
             var build = new Build();
-            /*build.Squares[Vector3.zero] = SquareType.White;
-            build.Squares[Vector3.up] = SquareType.Blue;
+            build.Squares[Vector3.zero] = SquareType.White;
+            /*build.Squares[Vector3.up] = SquareType.Blue;
             build.Mappings[Vector3.up] = KeyCode.I;
             build.Squares[Vector3.left] = SquareType.Blue;
             build.Mappings[Vector3.left] = KeyCode.L;

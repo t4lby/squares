@@ -43,7 +43,10 @@ public class RealtimeBuilder : MonoBehaviour
 
     private void Start()
     {
-        AddListenersToUI(UI);
+        UI.UpdateListeners(SelectSquare,
+                           SetErase,
+                           SetRotate,
+                           SetAssign);
         SelectedSquare = SquareType.Green;
         this.JointTargets = new List<Square>();
     }
@@ -103,7 +106,7 @@ public class RealtimeBuilder : MonoBehaviour
         }
 	}
 
-    private void AddListenersToUI(UIController uI)
+    private void UpdateUIListeners(UIController uI)
     {
         foreach (var squareCount in uI.SquareCounts)
         {

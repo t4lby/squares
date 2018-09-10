@@ -79,6 +79,7 @@ public class Player
         foreach (var pair in toDrop)
         {
             this.Squares[pair.Key].Player = null;
+            this.Squares[pair.Key].Regenerates = false;
             this.Squares.Remove(pair.Key);
             this.Build.RemoveFromAll(pair.Key);
         }
