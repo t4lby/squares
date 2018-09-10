@@ -212,7 +212,7 @@ public class BuilderController : MonoBehaviour {
         }
     }
 
-    private IEnumerator MapKeyFromUser(Vector3 gridPoint)
+    private IEnumerator MapKeyFromUser(Vector3 posInPlayer)
     {
         while (!Input.anyKeyDown | Input.GetKey(KeyCode.Mouse0))
         {
@@ -222,7 +222,7 @@ public class BuilderController : MonoBehaviour {
         {
             if (Input.GetKeyDown(kcode))
             {
-                _Player.Build.Mappings[gridPoint] = kcode;
+                _Player.Build.Mappings[posInPlayer] = kcode;
                 Debug.Log(kcode);
             }
         }

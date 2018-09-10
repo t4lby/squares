@@ -94,13 +94,12 @@ public class RealtimeBuilder : MonoBehaviour
                 case (Tool.Rotate):
                     break;
                 case (Tool.Assign):
+                    if (_Selector.Target != null && _Selector.Target.Player != null)
+                    {
+                        StartCoroutine(MapKeyFromUser(_Selector.Target.PositionInPlayer));
+                    }
                     break;
             }
-        }
-
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            JointTargets = new List<Square>();
         }
 	}
 
@@ -196,15 +195,6 @@ public class RealtimeBuilder : MonoBehaviour
         return q;
     }
 
-    IEnumerator WaitForKeyPress()
-    {
-        while (!Input.anyKeyDown)
-        {
-            Debug.Log("waiting for key");
-            yield return null;
-        }
-    }
-
     /// <summary>
     /// Attempts to place a square where the build square is currently.
     /// </summary>
@@ -253,5 +243,32 @@ public class RealtimeBuilder : MonoBehaviour
         var results = new List<RaycastResult>();
         EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
         return results.Count > 0;
+    }
+
+    IEnumerator WaitForKeyPress()
+    {
+        while (!Input.anyKeyDown)
+        {
+            Debug.Log("waiting for key");
+            yield return null;
+        }
+    }
+
+    private IEnumerator MapKeyFromUser(Vector3 posInPlayer)
+    {
+        while (!Input.anyKeyDown | Input.GetKey(KeyCode.Mouse0))
+        {
+            yield return null;
+        }
+        foreach (KeyCode kcode in Enum.GetValues(typeof(KeyCode)))
+        {
+            if (Input.GetKeyDown(kcode))
+            {
+                Player.Build.Mappings[posInPlayer] = kcode;
+                Player.Squares[posInPlayer].Mapped = true;
+                Player.Squares[posInPlayer].Mapping = kcode;
+                Debug.Log(kcode);
+            }
+        }
     }
 }
