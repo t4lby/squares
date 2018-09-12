@@ -107,7 +107,7 @@ public class RealtimeBuilder : MonoBehaviour
             switch (_Tool)
             {
                 case (Tool.Erase):
-                    if (_Selector.Target != null)
+                    if (_Selector.Target != null && _Selector.Target.Player != null)
                     {
                         Factory.DestroySquare(_Selector.Target);
                     }
