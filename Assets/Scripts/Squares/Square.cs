@@ -91,6 +91,12 @@ public abstract class Square : MonoBehaviour
     /// </summary>
     public List<Square> ConnectedTo { get; set; }
 
+    /// <summary>
+    /// Indicates whether the square is a 'build square', a UI placeholder
+    /// for spawning squares.
+    /// </summary>
+    public bool IsBuildSquare { get; set; }
+
     protected abstract void SetSquareProperties();
 
     /// <summary>
@@ -123,7 +129,7 @@ public abstract class Square : MonoBehaviour
         }
     }
 
-    private void Awake()
+    protected void Awake()
     {
         this.SetSquareProperties();
         this.ConnectedTo = new List<Square>();
@@ -174,13 +180,14 @@ public abstract class Square : MonoBehaviour
             if (buildSquare.SnapTarget == null)
             {
                 buildSquare.SnapTarget = this;
+                buildSquare.Triggered = this.Player != null;
             }
             if (buildSquare.SnapTarget == this)
             {
                 buildSquare.transform.parent = this.transform;
                 buildSquare.transform.rotation = this.transform.rotation;
                 buildSquare.transform.localPosition =
-                               UITools.BestDirection(other.transform.localPosition)
+                               Tools.BestDirection(other.transform.localPosition)
                                * Game.SquareSize;
             }
             if (!Game.Players[0].Builder.JointTargets.Contains(this) &&

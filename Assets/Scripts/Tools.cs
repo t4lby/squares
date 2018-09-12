@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-public static class UITools
+public static class Tools
 {
     public static Vector3 GetMousePositionInScene()
     {
