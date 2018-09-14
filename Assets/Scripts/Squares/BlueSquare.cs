@@ -27,19 +27,9 @@ public class BlueSquare : Square
     private void SetTriggerSurrounding(bool value)
     {
         this.Triggered = value;
-        var directions = new List<Vector3>
+        foreach (var connectedSquare in this.ConnectedTo)
         {
-            Vector3.up,
-            Vector3.down,
-            Vector3.left,
-            Vector3.right
-        };
-        foreach (var d in directions)
-        {
-            if (this.Player.Squares.ContainsKey(this.PositionInPlayer + d))
-            {
-                this.Player.Squares[this.PositionInPlayer + d].Triggered = value;
-            }
+            connectedSquare.Triggered = value;
         }
     }
 

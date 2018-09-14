@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 /// <summary>
 /// Mono-behavoir solely for building and initialising GameObjects.
@@ -24,13 +25,13 @@ public class Factory : MonoBehaviour
         if (Game.Players.Count == 0)
         {
             var inv = new Inventory();
-            /*inv.Squares[SquareType.Purple] = 50;
+            inv.Squares[SquareType.Purple] = 50;
             inv.Squares[SquareType.Blue] = 20;
             inv.Squares[SquareType.Yellow] = 10;
-            inv.Squares[SquareType.Red] = 10;*/
+            inv.Squares[SquareType.Red] = 10;
             var build = new Build();
-            build.Squares[Vector3.zero] = SquareType.White;
-            /*build.Squares[Vector3.up] = SquareType.Blue;
+            build.Squares[Vector3.zero] = SquareType.White;/*
+            build.Squares[Vector3.up] = SquareType.Blue;
             build.Mappings[Vector3.up] = KeyCode.I;
             build.Squares[Vector3.left] = SquareType.Blue;
             build.Mappings[Vector3.left] = KeyCode.L;
@@ -134,17 +135,18 @@ public class Factory : MonoBehaviour
             var rotation = build.Rotations.ContainsKey(buildPair.Key) ?
                                 build.Rotations[buildPair.Key] :
                                 Quaternion.identity;
-            player.Squares[buildPair.Key] = this.SpawnSquare(buildPair.Value,
-                                                        position + buildPair.Key * Game.SquareSize,
-                                                        Vector3.zero,
-                                                        rotation);
-            player.Squares[buildPair.Key].Player = player;
-            player.Squares[buildPair.Key].Regenerates = true;
-            player.Squares[buildPair.Key].PositionInPlayer = buildPair.Key;
+            var square = this.SpawnSquare(buildPair.Value,
+                                          position + buildPair.Key * Game.SquareSize,
+                                          Vector3.zero,
+                                          rotation);
+            player.Squares.Add(square);
+            square.Player = player;
+            square.Regenerates = true;
+            square.PositionInPlayer = buildPair.Key;
             if (build.Mappings.ContainsKey(buildPair.Key))
             {
-                player.Squares[buildPair.Key].Mapped = true;
-                player.Squares[buildPair.Key].Mapping =
+                square.Mapped = true;
+                square.Mapping =
                     build.Mappings[buildPair.Key];
             }
         }
@@ -153,10 +155,11 @@ public class Factory : MonoBehaviour
         {
             foreach (var direction in Game.Directions)
             {
-                if (player.Squares.ContainsKey(square.Key + direction))
+                var lookup = player.Squares.Where(sq => sq.PositionInPlayer == square.PositionInPlayer + direction);
+                if (lookup.Count() == 1)
                 {
-                    FixSquares(square.Value,
-                               player.Squares[square.Key + direction]);
+                    FixSquares(square,
+                               lookup.Single());
                 }
             }
         }
@@ -190,14 +193,7 @@ public class Factory : MonoBehaviour
         joint.enablePreprocessing = false;
         joint.enableCollision = false;
         joint.connectedBody = squareB.gameObject.GetComponent<Rigidbody>();
-        if (!squareA.ConnectedTo.Contains(squareB))
-        {
-            squareA.ConnectedTo.Add(squareB);
-        }
-        if (!squareB.ConnectedTo.Contains(squareA))
-        {
-            squareB.ConnectedTo.Add(squareA);
-        }
+        squareA.ConnectedTo.Add(squareB);
     }
 
     /// <summary>
@@ -265,16 +261,27 @@ public class Factory : MonoBehaviour
                          square.GetComponent<Rigidbody>().velocity,
                          square.Color);
 
-        //remove joints
+        //remove joints qq: move to own method.
+        var toUnConnect = new List<Square>();
         foreach (var connectedSquare in square.ConnectedTo)
         {
+            var toDestroy = new List<FixedJoint>();
             foreach (var otherJoint in connectedSquare.GetComponents<FixedJoint>())
             {
                 if (otherJoint.connectedBody == square.GetComponent<Rigidbody>())
                 {
-                    Destroy(otherJoint);
+                    toDestroy.Add(otherJoint);
                 }
             }
+            for (int i = toDestroy.Count - 1; i >= 0; i--)
+            {
+                Destroy(toDestroy[i]);
+            }
+            toUnConnect.Add(connectedSquare);
+        }
+        foreach (var connectedSquare in toUnConnect)
+        {
+            square.ConnectedTo.Remove(connectedSquare);
             connectedSquare.ConnectedTo.Remove(square);
         }
 
@@ -283,10 +290,9 @@ public class Factory : MonoBehaviour
             square.Player.Build.Squares.Remove(square.PositionInPlayer);
             square.Player.Build.Rotations.Remove(square.PositionInPlayer);
             square.Player.Build.Mappings.Remove(square.PositionInPlayer);
-            square.Player.Squares.Remove(square.PositionInPlayer);
+            square.Player.Squares.Remove(square);
             square.Player.DropSmallestComponents();
         }
-
         SpawnedSquares.Remove(square);
         Destroy(square.gameObject);
     }

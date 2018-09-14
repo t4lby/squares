@@ -35,7 +35,10 @@ public class WhiteSquare : Square
 
     private void FixedUpdate()
     {
-        this.GetComponent<Rigidbody>()
-            .AddForce(new Vector3(_xInput, _yInput) * Acceleration);
+        if (this.Player != null)
+        {
+            this.GetComponent<Rigidbody>()
+                .AddForce(new Vector3(_xInput, _yInput) * Acceleration); 
+        }
     }
 }

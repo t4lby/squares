@@ -48,8 +48,6 @@ public class RealtimeBuilder : MonoBehaviour
 
     private Tool _Tool;
 
-    private Vector3 _DragStartPos;
-
     private bool _DraggingRotation;
 
     public UIController UI;
@@ -60,6 +58,7 @@ public class RealtimeBuilder : MonoBehaviour
                            SetErase,
                            SetRotate,
                            SetAssign);
+        SetErase();
         SelectedSquare = SquareType.Green;
         this.JointTargets = new List<Square>();
     }
@@ -116,7 +115,6 @@ public class RealtimeBuilder : MonoBehaviour
                     if (Player.Inventory.Squares[SelectedSquare] > 0)
                     {
                         _DraggingRotation = true;
-                        _DragStartPos = Tools.GetMousePositionInScene();
                     }
                     break;
                 case (Tool.Rotate):
@@ -124,7 +122,7 @@ public class RealtimeBuilder : MonoBehaviour
                 case (Tool.Assign):
                     if (_Selector.Target != null && _Selector.Target.Player != null)
                     {
-                        StartCoroutine(MapKeyFromUser(_Selector.Target.PositionInPlayer));
+                        StartCoroutine(MapKeyFromUser(_Selector.Target));
                     }
                     break;
             }
@@ -270,17 +268,11 @@ public class RealtimeBuilder : MonoBehaviour
         {
             Factory.FixSquares(square, spawnedSquare);
             Factory.FixSquares(spawnedSquare, square);
-            if (square.Player != null)
+            if (square.Player != null && spawnedSquare.Player == null)
             {
                 spawnedSquare.Player = square.Player;
                 spawnedSquare.Regenerates = true;
-                spawnedSquare.transform.parent = square.transform;
-                var posInPlayer = Game.RoundVectorToInt(square.PositionInPlayer +
-                                                        spawnedSquare.transform.localPosition / Game.SquareSize);
-                spawnedSquare.Player.Squares[posInPlayer] = spawnedSquare;
-                spawnedSquare.Player.Build.Squares[posInPlayer] = SelectedSquare;
-                spawnedSquare.PositionInPlayer = posInPlayer;
-                spawnedSquare.transform.parent = null;
+                spawnedSquare.Player.Squares.Add(spawnedSquare);
             }
         }
         return true;
@@ -306,7 +298,7 @@ public class RealtimeBuilder : MonoBehaviour
         }
     }
 
-    private IEnumerator MapKeyFromUser(Vector3 posInPlayer)
+    private IEnumerator MapKeyFromUser(Square square)
     {
         while (!Input.anyKeyDown | Input.GetKey(KeyCode.Mouse0))
         {
@@ -316,9 +308,8 @@ public class RealtimeBuilder : MonoBehaviour
         {
             if (Input.GetKeyDown(kcode))
             {
-                Player.Build.Mappings[posInPlayer] = kcode;
-                Player.Squares[posInPlayer].Mapped = true;
-                Player.Squares[posInPlayer].Mapping = kcode;
+                square.Mapped = true;
+                square.Mapping = kcode;
                 Debug.Log(kcode);
             }
         }
