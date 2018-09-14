@@ -51,3 +51,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5df90265c6cf240d0bec27b0f3edd24d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SelectedSquare: 0
+  SelectorPrefab: {fileID: 1975671033428054, guid: b4bdf78b0347a4717a27472c1a1fd5cc,
+    type: 2}
+  UI: {fileID: 0}

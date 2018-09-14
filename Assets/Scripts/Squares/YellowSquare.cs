@@ -31,8 +31,7 @@ public class YellowSquare : Square
     {
         if (Triggered &&
             _TriggerHeld == false &&
-            this.Player != null &&
-            !this.Player.Squares.ContainsKey(this.PositionInPlayer + Vector3.up))
+            this.Player != null)
         {
             var angle = this.transform.rotation.eulerAngles.z * Mathf.PI / 180;
             var bulletDirection = new Vector3(-Mathf.Sin(angle),

@@ -16,6 +16,14 @@ public class RedSquare : Square
         this.RegenerationSpeed = 0.1f;
     }
 
+    private void Start()
+    {
+        if (IsBuildSquare)
+        {
+            Destroy(Particles.GetComponent<Collider>());
+        }
+    }
+
     protected override void UpdateSquare()
     {
         if (Triggered)

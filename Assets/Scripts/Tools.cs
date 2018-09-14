@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-public static class UITools
+public static class Tools
 {
     public static Vector3 GetMousePositionInScene()
     {
@@ -30,5 +30,14 @@ public static class UITools
             }
         }
         return bestDir;
+    }
+
+    public static void SetTriggerSurrounding(Square square, bool value)
+    {
+        square.Triggered = value;
+        foreach (var connectedSquare in square.ConnectedTo)
+        {
+            connectedSquare.Triggered = value;
+        }
     }
 }    

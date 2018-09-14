@@ -48,6 +48,8 @@ public class RealtimeBuilder : MonoBehaviour
 
     private Tool _Tool;
 
+    private bool _DraggingRotation;
+
     public UIController UI;
 
     private void Start()
@@ -56,51 +58,64 @@ public class RealtimeBuilder : MonoBehaviour
                            SetErase,
                            SetRotate,
                            SetAssign);
+        SetErase();
         SelectedSquare = SquareType.Green;
         this.JointTargets = new List<Square>();
     }
 
     private void Update ()
     {
+        if (_Selector != null)
+        {
+            _Selector.transform.position = Tools.GetMousePositionInScene();
+        }
         if (_BuildSquare != null)
         {
-            if ((_BuildSquare.transform.position - UITools.GetMousePositionInScene()).magnitude > _SnapThreshold)
+            var mousePosition = Tools.GetMousePositionInScene();
+            if ((_BuildSquare.transform.position - mousePosition).magnitude > _SnapThreshold
+                && !_DraggingRotation)
             {
                 _BuildSquare.Snapped = false;
+                _BuildSquare.Triggered = false;
                 _BuildSquare.SnapTarget = null;
                 _BuildSquare.transform.parent = null;
             }
             if (_BuildSquare.Snapped == false)
             {
-                _BuildSquare.transform.position = UITools.GetMousePositionInScene();
+                _BuildSquare.transform.position = mousePosition;
+            }
+            if (_DraggingRotation && _BuildSquare.Snapped)
+            {
+                var dragDirection = mousePosition - _BuildSquare.transform.position;
+                var dragRotation = Quaternion.LookRotation(Vector3.forward, dragDirection);
+                var zDiff = (_BuildSquare.SnapTarget.transform.rotation.eulerAngles.z - dragRotation.eulerAngles.z+405)%360;
+                var rotation = new Quaternion();
+                rotation.eulerAngles = new Vector3(0, 0,
+                                _BuildSquare.SnapTarget.transform.rotation.eulerAngles.z -
+                                                   (zDiff - (zDiff % 90)));
+                _BuildSquare.transform.rotation = rotation;
+                                
             }
             _BuildSquare.Health = 0.5f + Mathf.Sin(Time.time * 5) / 2;
             _BuildSquare.UpdateTransparency();
         }
 
-        if (_Selector != null)
-        {
-            _Selector.transform.position = UITools.GetMousePositionInScene();
-        }
 
         if (Input.GetMouseButtonDown(0) && !IsPointerOverUIObject())
         {
             switch (_Tool)
             {
                 case (Tool.Erase):
-                    if (_Selector.Target != null)
+                    if (_Selector.Target != null && _Selector.Target.Player != null)
                     {
                         Factory.DestroySquare(_Selector.Target);
                     }
                     break;
                 case (Tool.Build):
-                    if (Player.Inventory.Squares[SelectedSquare] > 0)
+                    if (Player.Inventory.Squares[SelectedSquare] > 0
+                        && _BuildSquare != null)
                     {
-                        if (PlaceBuildSquare())
-                        {
-                            Player.Inventory.Squares[SelectedSquare] -= 1;
-                        }
-                        UI.UpdateSquareCountUI(Player.Inventory.Squares);
+                        _DraggingRotation = true;
                     }
                     break;
                 case (Tool.Rotate):
@@ -108,8 +123,26 @@ public class RealtimeBuilder : MonoBehaviour
                 case (Tool.Assign):
                     if (_Selector.Target != null && _Selector.Target.Player != null)
                     {
-                        StartCoroutine(MapKeyFromUser(_Selector.Target.PositionInPlayer));
+                        StartCoroutine(MapKeyFromUser(_Selector.Target));
                     }
+                    break;
+            }
+        }
+        if (Input.GetMouseButtonUp(0) && !IsPointerOverUIObject())
+        {
+            switch (_Tool)
+            {
+                case (Tool.Build):
+                    if (Player.Inventory.Squares[SelectedSquare] > 0 &&
+                        _BuildSquare != null)
+                    {
+                        if (PlaceBuildSquare())
+                        {
+                            Player.Inventory.Squares[SelectedSquare] -= 1;
+                        }
+                        UI.UpdateSquareCountUI(Player.Inventory.Squares);
+                    }
+                    _DraggingRotation = false;
                     break;
             }
         }
@@ -166,17 +199,24 @@ public class RealtimeBuilder : MonoBehaviour
         _Tool = Tool.Build;
         SelectedSquare = color;
         DestroyBuildSquare();
-        _BuildSquare = Factory.SpawnSquare(SelectedSquare,
-                                           UITools.GetMousePositionInScene(),
+        _BuildSquare = SpawnBuildSquare();
+    }
+
+    private Square SpawnBuildSquare()
+    {
+        var buildSquare = Factory.SpawnSquare(SelectedSquare,
+                                           Tools.GetMousePositionInScene(),
                                            Vector3.zero,
                                            Quaternion.identity);
-        _BuildSquare.GetComponent<Collider>().isTrigger = true;
-        _BuildSquare.GetComponent<BoxCollider>().size = BuildSquareColliderSize1;
-        var collider2 = _BuildSquare.gameObject.AddComponent<BoxCollider>();
+        buildSquare.GetComponent<Collider>().isTrigger = true;
+        buildSquare.GetComponent<BoxCollider>().size = BuildSquareColliderSize1;
+        var collider2 = buildSquare.gameObject.AddComponent<BoxCollider>();
         collider2.size = BuildSquareColliderSize2;
         collider2.isTrigger = true;
-        _BuildSquare.Invincible = true;
-        _BuildSquare.tag = "BuildSquare";
+        buildSquare.Invincible = true;
+        buildSquare.tag = "BuildSquare";
+        buildSquare.IsBuildSquare = true;
+        return buildSquare;
     }
 
     private Selector SpawnSelector()
@@ -230,17 +270,11 @@ public class RealtimeBuilder : MonoBehaviour
         {
             Factory.FixSquares(square, spawnedSquare);
             Factory.FixSquares(spawnedSquare, square);
-            if (square.Player != null)
+            if (square.Player != null && spawnedSquare.Player == null)
             {
                 spawnedSquare.Player = square.Player;
                 spawnedSquare.Regenerates = true;
-                spawnedSquare.transform.parent = square.transform;
-                var posInPlayer = Game.RoundVectorToInt(square.PositionInPlayer +
-                                                        spawnedSquare.transform.localPosition / Game.SquareSize);
-                spawnedSquare.Player.Squares[posInPlayer] = spawnedSquare;
-                spawnedSquare.Player.Build.Squares[posInPlayer] = SelectedSquare;
-                spawnedSquare.PositionInPlayer = posInPlayer;
-                spawnedSquare.transform.parent = null;
+                spawnedSquare.Player.Squares.Add(spawnedSquare);
             }
         }
         return true;
@@ -266,7 +300,7 @@ public class RealtimeBuilder : MonoBehaviour
         }
     }
 
-    private IEnumerator MapKeyFromUser(Vector3 posInPlayer)
+    private IEnumerator MapKeyFromUser(Square square)
     {
         while (!Input.anyKeyDown | Input.GetKey(KeyCode.Mouse0))
         {
@@ -276,9 +310,8 @@ public class RealtimeBuilder : MonoBehaviour
         {
             if (Input.GetKeyDown(kcode))
             {
-                Player.Build.Mappings[posInPlayer] = kcode;
-                Player.Squares[posInPlayer].Mapped = true;
-                Player.Squares[posInPlayer].Mapping = kcode;
+                square.Mapped = true;
+                square.Mapping = kcode;
                 Debug.Log(kcode);
             }
         }

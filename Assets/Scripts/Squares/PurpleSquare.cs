@@ -22,13 +22,15 @@ public class PurpleSquare : Square
     {
         if (Triggered)
         {
-            var angle = this.transform.rotation.eulerAngles.z * Mathf.PI / 180;
-            var boostDirection = new Vector3(-Mathf.Sin(angle),
-                                             Mathf.Cos(angle),
-                                             0);
-
-            this.GetComponent<Rigidbody>()
-                .AddForce(boostDirection * _Acceleration);
+            if (!IsBuildSquare)
+            {
+                var angle = this.transform.rotation.eulerAngles.z * Mathf.PI / 180;
+                var boostDirection = new Vector3(-Mathf.Sin(angle),
+                                                 Mathf.Cos(angle),
+                                                 0);
+                this.GetComponent<Rigidbody>()
+                    .AddForce(boostDirection * _Acceleration);
+            }
             if (Particles != null)
             {
                 Particles.SetActive(true);

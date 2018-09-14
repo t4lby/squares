@@ -35,13 +35,43 @@ public static class Algorithms
         }
     }
 
+    public static Dictionary<Square, int> Tarjan(List<Square> squares)
+    {
+        var components = new Dictionary<Square, int>();
+
+        int i = 0;
+        foreach (var square in squares)
+        {
+            if (!components.ContainsKey(square))
+            {
+                CheckNode(square, components, i);
+                i++;
+            }
+        }
+        return components;
+    }
+
+    private static void CheckNode(Square square,
+                                  Dictionary<Square, int> components,
+                                  int componentNo)
+    {
+        components[square] = componentNo;
+        foreach (var connectedSquare in square.ConnectedTo)
+        {
+            if (!components.ContainsKey(connectedSquare))
+            {
+                CheckNode(connectedSquare, components, componentNo);
+            }
+        }
+    }
+
     public static bool AreInSameComponent(Square SquareA, Square SquareB)
     {
         if (SquareA == SquareB)
         {
             return true;
         }
-        var toCheck = SquareA.ConnectedTo;
+        var toCheck = SquareA.ConnectedTo.ToList();
         var checkedSquares = new List<Square>();
         while (toCheck.Count > 0)
         {

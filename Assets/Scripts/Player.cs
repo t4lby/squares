@@ -29,7 +29,7 @@ public class Player
     /// <summary>
     /// The square objects themselves.
     /// </summary>
-    public Dictionary<Vector3,Square> Squares { get; set; }
+    public List<Square> Squares { get; set; }
 
     public void PickupSquare(SquareType color)
     {
@@ -40,24 +40,24 @@ public class Player
 
     public Player()
     {
-        this.Squares = new Dictionary<Vector3, Square>();
+        this.Squares = new List<Square>();
     }
 
     public Vector3 GetPosition()
     {
-        var total = new Vector3();
-        foreach (var pair in Squares)
+        var total = Vector3.zero;
+        foreach (var square in Squares)
         {
-            total += pair.Value.transform.position;
+            total += square.transform.position;
         }
-        return total / Squares.Count;
+        return Squares.Count == 0 ? Vector3.zero : total / Squares.Count;
     }
 
     public void DropSmallestComponents()
     {
-        Algorithms.Tarjan(this.Build);
+        var components = Algorithms.Tarjan(this.Squares);
         Dictionary<int, int> count = new Dictionary<int, int>();
-        foreach (var pair in this.Build.Components)
+        foreach (var pair in components)
         {
             count[pair.Value] = count.ContainsKey(pair.Value) ?
                                      count[pair.Value] + 1 : 1;
@@ -74,20 +74,20 @@ public class Player
                 largest = pair.Key;
             }
         }
-        var toDrop = this.Build.Components.Where((pair) => pair.Value != largest);
-        var toKeep = this.Build.Components.Where((pair) => pair.Value == largest);
-        foreach (var pair in toDrop)
+        var toDrop = components.Where((pair) => pair.Value != largest);
+        var toKeep = components.Where((pair) => pair.Value == largest);
+        foreach (var squareIntPair in toDrop)
         {
-            this.Squares[pair.Key].Player = null;
-            this.Squares[pair.Key].Regenerates = false;
-            this.Squares.Remove(pair.Key);
-            this.Build.RemoveFromAll(pair.Key);
+            squareIntPair.Key.Player = null;
+            squareIntPair.Key.Regenerates = false;
+            squareIntPair.Key.Triggered = false;
+            this.Squares.Remove(squareIntPair.Key);
         }
         if (toDrop.Count() > 0)
         {
-            foreach (var pair in toKeep)
+            foreach (var squareIntPair in toKeep)
             {
-                this.Squares[pair.Key].Triggered = false;
+                squareIntPair.Key.Triggered = false;
             }
         }
     }
