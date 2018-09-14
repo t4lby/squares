@@ -24,24 +24,15 @@ public class BlueSquare : Square
         }
     }
 
-    private void SetTriggerSurrounding(bool value)
-    {
-        this.Triggered = value;
-        foreach (var connectedSquare in this.ConnectedTo)
-        {
-            connectedSquare.Triggered = value;
-        }
-    }
-
     private void ProcessTriggers()
     {
         if (Input.GetKey(Mapping))
         {
-            SetTriggerSurrounding(true);
+            Tools.SetTriggerSurrounding(this, true);
         }
-        else
+        if (Input.GetKeyUp(Mapping))
         {
-            SetTriggerSurrounding(false);
+            Tools.SetTriggerSurrounding(this, false);
         }
 
         if (this.Triggered)

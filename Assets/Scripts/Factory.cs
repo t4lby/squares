@@ -261,6 +261,7 @@ public class Factory : MonoBehaviour
                          square.GetComponent<Rigidbody>().velocity,
                          square.Color);
 
+        Tools.SetTriggerSurrounding(square, false);
         //remove joints qq: move to own method.
         var toUnConnect = new List<Square>();
         foreach (var connectedSquare in square.ConnectedTo)

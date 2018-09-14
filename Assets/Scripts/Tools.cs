@@ -31,4 +31,13 @@ public static class Tools
         }
         return bestDir;
     }
+
+    public static void SetTriggerSurrounding(Square square, bool value)
+    {
+        square.Triggered = value;
+        foreach (var connectedSquare in square.ConnectedTo)
+        {
+            connectedSquare.Triggered = value;
+        }
+    }
 }    
