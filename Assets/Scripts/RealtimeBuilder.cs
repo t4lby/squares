@@ -112,7 +112,8 @@ public class RealtimeBuilder : MonoBehaviour
                     }
                     break;
                 case (Tool.Build):
-                    if (Player.Inventory.Squares[SelectedSquare] > 0)
+                    if (Player.Inventory.Squares[SelectedSquare] > 0
+                        && _BuildSquare != null)
                     {
                         _DraggingRotation = true;
                     }
@@ -132,7 +133,8 @@ public class RealtimeBuilder : MonoBehaviour
             switch (_Tool)
             {
                 case (Tool.Build):
-                    if (Player.Inventory.Squares[SelectedSquare] > 0)
+                    if (Player.Inventory.Squares[SelectedSquare] > 0 &&
+                        _BuildSquare != null)
                     {
                         if (PlaceBuildSquare())
                         {

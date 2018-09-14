@@ -294,6 +294,10 @@ public class Factory : MonoBehaviour
             square.Player.Squares.Remove(square);
             square.Player.DropSmallestComponents();
         }
+        foreach(var p in Game.Players)
+        {
+            p.Builder.JointTargets.Remove(square);
+        }
         SpawnedSquares.Remove(square);
         Destroy(square.gameObject);
     }
