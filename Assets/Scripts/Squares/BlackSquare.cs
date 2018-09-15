@@ -1,17 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class NewMonoBehaviour : MonoBehaviour
+public class BlackSquare : Square
 {
     // Use this for initialization
-    void Start()
+    protected override void SetSquareProperties()
     {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+        this.Health = 1f;
+        this.Durability = 50f;
+        this.Color = SquareType.Black;
+        this.MinimumTransparency = 0.25f;
+        this.RegenerationSpeed = 0.1f;
+        this.Invincible = true;
     }
 }
