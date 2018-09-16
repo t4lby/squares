@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using LevelBuilding;
 
 /// <summary>
 /// Mono-behavoir solely for building and initialising GameObjects.
@@ -22,6 +23,8 @@ public class Factory : MonoBehaviour
 
     private void Start()
     {
+        this.SpawnLevel(LevelReader.ReadLevel(@"Assets/Levels/Level1.csv"));
+
         if (Game.Players.Count == 0)
         {
             var inv = new Inventory();
@@ -30,7 +33,8 @@ public class Factory : MonoBehaviour
             inv.Squares[SquareType.Yellow] = 10;
             inv.Squares[SquareType.Red] = 10;
             var build = new Build();
-            build.Squares[Vector3.zero] = SquareType.White;/*
+            build.Squares[Vector3.zero] = SquareType.White;
+            /*
             build.Squares[Vector3.up] = SquareType.Blue;
             build.Mappings[Vector3.up] = KeyCode.I;
             build.Squares[Vector3.left] = SquareType.Blue;
@@ -63,7 +67,7 @@ public class Factory : MonoBehaviour
     {
         if (Time.time > nextSpawn)
         {
-            SpawnRandomSquareInCircle(Game.Players[0].Position, 3, 10, true);
+        //    SpawnRandomSquareInCircle(Game.Players[0].Position, 3, 10, true);
             nextSpawn = Time.time + spawnDiff;
         }
 
@@ -111,6 +115,8 @@ public class Factory : MonoBehaviour
                 var red = square.AddComponent<RedSquare>();
                 red.Particles = SpawnFireParticles(red.gameObject.transform);
                 return red;
+            case SquareType.Black:
+                return square.AddComponent<BlackSquare>();
             default:
                 throw new UnityException(message: "Square type not found.");
         }
@@ -324,5 +330,55 @@ public class Factory : MonoBehaviour
         var position = centre + Random.Range(minRadius, maxRadius) * new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0);
 
         SpawnSquare(sType, position, Vector3.zero, rotation);
+    }
+
+    private void SpawnLevel(CellInfo[,] level)
+    {
+        var height = level.GetLength(0);
+        var width = level.GetLength(1);
+        var spawned = new Square[height, width];
+        //spawnsquares
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                if (level[i,j].Color != SquareType.Blank)
+                {
+                    var rotation = new Quaternion();
+                    rotation.eulerAngles = new Vector3(0, 0, level[i,j].Rotation);
+                    var square = this.SpawnSquare(level[i,j].Color,
+                                                new Vector3(j, -i, 0) * Game.SquareSize,
+                                                Vector3.zero,
+                                                Quaternion.identity);
+                    if (level[i,j].Fixed)
+                    {
+                        square.GetComponent<Rigidbody>().constraints =
+                                  RigidbodyConstraints.FreezeAll;
+                    }
+                    spawned[i,j] = square;
+                }
+            }
+        }
+        //join them
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                if (level[i,j].Color != SquareType.Blank)
+                {
+                    foreach (var c in level[i,j].JoinDirections)
+                    {
+                        var dir = Tools.CharToDirection(c);
+                        if (i + dir[0] >= 0 && i + dir[0] < height &&
+                            j + dir[1] >= 0 && j + dir[1] < width &&
+                            spawned[i+dir[0], j+dir[1]] != null)
+                        {
+                            FixSquares(spawned[i, j],
+                                       spawned[i + dir[0], j + dir[1]]);
+                        }
+                    }
+                }
+            }
+        }
     }
 }

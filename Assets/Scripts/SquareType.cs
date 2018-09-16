@@ -4,5 +4,5 @@
 
 public enum SquareType
 {
-    White, Black, Grey, Yellow, Red, Blue, Green, Brown, Pink, Orange, Purple
+    White, Black, Grey, Yellow, Red, Blue, Green, Brown, Pink, Orange, Purple, Blank
 }

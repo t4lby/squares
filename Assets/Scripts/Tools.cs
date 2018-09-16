@@ -40,4 +40,21 @@ public static class Tools
             connectedSquare.Triggered = value;
         }
     }
+
+    public static int[] CharToDirection(char c)
+    {
+        switch (c)
+        {
+            case 'U':
+                return new int[] { -1, 0 };
+            case 'D':
+                return new int[] { 1, 0 };
+            case 'L':
+                return new int[] { 0, -1 };
+            case 'R':
+                return new int[] { 0, 1 };
+            default:
+                throw new UnityException(message: "invalid direction letter");
+        }
+    }
 }    
