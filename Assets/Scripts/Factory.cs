@@ -19,11 +19,13 @@ public class Factory : MonoBehaviour
     public GameObject BulletPrefab;
     public GameObject BuilderPrefab;
 
-    public List<Square> SpawnedSquares;
+    public int LevelNumber;
 
     private void Start()
     {
-        this.SpawnLevel(LevelReader.ReadLevel(@"Assets/Levels/Level1.csv"));
+        this.SpawnLevel(LevelReader.ReadLevel(@"Assets/Levels/Level"
+                                              + LevelNumber.ToString()
+                                              + ".csv"));
 
         if (Game.Players.Count == 0)
         {
@@ -34,21 +36,11 @@ public class Factory : MonoBehaviour
             inv.Squares[SquareType.Red] = 10;
             var build = new Build();
             build.Squares[Vector3.zero] = SquareType.White;
-            /*
-            build.Squares[Vector3.up] = SquareType.Blue;
-            build.Mappings[Vector3.up] = KeyCode.I;
-            build.Squares[Vector3.left] = SquareType.Blue;
-            build.Mappings[Vector3.left] = KeyCode.L;
-            build.Squares[Vector3.right] = SquareType.Blue;
-            build.Mappings[Vector3.right] = KeyCode.J;
-            build.Squares[Vector3.right + Vector3.down] = SquareType.Purple;
-            build.Squares[Vector3.left + Vector3.down] = SquareType.Purple;
-            build.Squares[Vector3.up * 2] = SquareType.Red;*/
             Game.Players.Add(
                 SpawnPlayer(
                     build,
                     inv,
-                    Vector3.zero));
+                    new Vector3(3,-3,0)));
         }
         else
         {
@@ -87,7 +79,6 @@ public class Factory : MonoBehaviour
         var squareScript = AttachSquare(color, squareObject);
         squareScript.Factory = this;
         squareObject.GetComponent<Rigidbody>().velocity = velocity;
-        SpawnedSquares.Add(squareScript);
         return squareScript;
     }
 
@@ -304,7 +295,6 @@ public class Factory : MonoBehaviour
         {
             p.Builder.JointTargets.Remove(square);
         }
-        SpawnedSquares.Remove(square);
         Destroy(square.gameObject);
     }
 
@@ -344,8 +334,10 @@ public class Factory : MonoBehaviour
             {
                 if (level[i,j].Color != SquareType.Blank)
                 {
-                    var rotation = new Quaternion();
-                    rotation.eulerAngles = new Vector3(0, 0, level[i,j].Rotation);
+                    var rotation = new Quaternion
+                    {
+                        eulerAngles = new Vector3(0, 0, level[i, j].Rotation)
+                    };
                     var square = this.SpawnSquare(level[i,j].Color,
                                                 new Vector3(j, -i, 0) * Game.SquareSize,
                                                 Vector3.zero,

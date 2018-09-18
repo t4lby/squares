@@ -233,7 +233,6 @@ public class RealtimeBuilder : MonoBehaviour
     {
         if (_BuildSquare != null)
         {
-            Factory.SpawnedSquares.Remove(_BuildSquare);
             Destroy(_BuildSquare.gameObject);
             _BuildSquare = null;
         }

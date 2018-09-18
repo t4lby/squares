@@ -157,7 +157,7 @@ MonoBehaviour:
     type: 2}
   BuilderPrefab: {fileID: 1655084618296638, guid: 6b43541f4b340438786b634d0ed1d481,
     type: 2}
-  SpawnedSquares: []
+  LevelNumber: 1
 --- !u!4 &430473194
 Transform:
   m_ObjectHideFlags: 0
