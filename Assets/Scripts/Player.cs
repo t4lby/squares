@@ -26,6 +26,9 @@ public class Player
     /// </summary>
     public Vector3 Position { get; set; }
 
+    private bool Alive;
+    private Vector3 _DeathPosition;
+
     /// <summary>
     /// The square objects themselves.
     /// </summary>
@@ -41,16 +44,22 @@ public class Player
     public Player()
     {
         this.Squares = new List<Square>();
+        this.Alive = true;
     }
 
     public Vector3 GetPosition()
     {
+        if (Squares.Count == 0 && this.Alive)
+        {
+            this._DeathPosition = this.Position;
+            this.Alive = false;
+        }
         var total = Vector3.zero;
         foreach (var square in Squares)
         {
             total += square.transform.position;
         }
-        return Squares.Count == 0 ? Vector3.zero : total / Squares.Count;
+        return Squares.Count == 0 ? _DeathPosition : total / Squares.Count;
     }
 
     public void DropSmallestComponents()

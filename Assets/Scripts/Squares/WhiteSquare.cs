@@ -21,8 +21,8 @@ public class WhiteSquare : Square
     protected override void SetSquareProperties()
     {
         this.Health = 1;
-        this.Durability = 10;
-        this.Invincible = true;
+        this.Durability = 60;
+        this.RegenerationSpeed = 0.1f;
         this.Color = SquareType.White;
         this.Acceleration = 20;
     }

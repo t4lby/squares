@@ -30,4 +30,21 @@ public abstract class Level : MonoBehaviour
                 inv,
                 SpawnLocation));
     }
+
+    protected void Update()
+    {
+        if (Game.Players[0].Squares.Count == 0)
+        {
+            PauseGame();
+        }
+    }
+
+    private void PauseGame()
+    {
+        Time.timeScale = 0;
+    }
+    private void ContinueGame()
+    {
+        Time.timeScale = 1;
+    }
 }
