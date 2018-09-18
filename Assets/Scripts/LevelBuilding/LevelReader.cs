@@ -37,7 +37,8 @@ namespace LevelBuilding
                         Color = PickColor(int.Parse(fields[0])),
                         Rotation = int.Parse(fields[1]),
                         Fixed = fields[2] == "1",
-                        JoinDirections = fields[3].ToCharArray()
+                        JoinDirections = fields[3].ToCharArray(),
+                        Identifier = fields[4]
                     };
                 }
             }

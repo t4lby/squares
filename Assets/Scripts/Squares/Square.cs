@@ -97,6 +97,11 @@ public abstract class Square : MonoBehaviour
     /// </summary>
     public bool IsBuildSquare { get; set; }
 
+    /// <summary>
+    /// Identifies the square in the level.
+    /// </summary>
+    public string Identifier { get; set; }
+
     protected abstract void SetSquareProperties();
 
     /// <summary>

@@ -19,38 +19,6 @@ public class Factory : MonoBehaviour
     public GameObject BulletPrefab;
     public GameObject BuilderPrefab;
 
-    public int LevelNumber;
-
-    private void Start()
-    {
-        this.SpawnLevel(LevelReader.ReadLevel(@"Assets/Levels/Level"
-                                              + LevelNumber.ToString()
-                                              + ".csv"));
-
-        if (Game.Players.Count == 0)
-        {
-            var inv = new Inventory();
-            inv.Squares[SquareType.Purple] = 50;
-            inv.Squares[SquareType.Blue] = 20;
-            inv.Squares[SquareType.Yellow] = 10;
-            inv.Squares[SquareType.Red] = 10;
-            var build = new Build();
-            build.Squares[Vector3.zero] = SquareType.White;
-            Game.Players.Add(
-                SpawnPlayer(
-                    build,
-                    inv,
-                    new Vector3(3,-3,0)));
-        }
-        else
-        {
-            Game.Players[0] = SpawnPlayer(
-                Game.Players[0].Build,
-                Game.Players[0].Inventory,
-                Vector3.zero);
-        }
-    }
-
     //test stub
     private float nextSpawn;
     private float spawnDiff = 3;
@@ -119,7 +87,7 @@ public class Factory : MonoBehaviour
     /// 
     /// Fixed joints are put in on squares that are next to one another.
     /// </summary>
-    private Player SpawnPlayer(Build build, Inventory inventory, Vector3 position)
+    public Player SpawnPlayer(Build build, Inventory inventory, Vector3 position)
     {
         var player = new Player
         {
@@ -322,11 +290,12 @@ public class Factory : MonoBehaviour
         SpawnSquare(sType, position, Vector3.zero, rotation);
     }
 
-    private void SpawnLevel(CellInfo[,] level)
+    public List<Square> SpawnLevel(CellInfo[,] level)
     {
         var height = level.GetLength(0);
         var width = level.GetLength(1);
         var spawned = new Square[height, width];
+        var output = new List<Square>();
         //spawnsquares
         for (int i = 0; i < height; i++)
         {
@@ -347,7 +316,9 @@ public class Factory : MonoBehaviour
                         square.GetComponent<Rigidbody>().constraints =
                                   RigidbodyConstraints.FreezeAll;
                     }
+                    square.Identifier = level[i, j].Identifier;
                     spawned[i,j] = square;
+                    output.Add(square);
                 }
             }
         }
@@ -372,5 +343,6 @@ public class Factory : MonoBehaviour
                 }
             }
         }
+        return output;
     }
 }

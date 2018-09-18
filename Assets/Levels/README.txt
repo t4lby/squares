@@ -3,7 +3,7 @@
     First row contains level size and width
     Remaining rows are cells in the following format.
 
-,A:B:C,
+,A:B:C:D:E,
 
 A - Cell Colour:
 Single number representing the color of the square taking up this cell.
@@ -32,6 +32,9 @@ This indicates whether the square is fixed in the scene or not.
 
 D - JoinIndicators
 Combination of the letters U,D,L,R indicating if the square is joined in these directions.
+
+E - Identifier
+A string identifying the square so that they may be picked up by the level script.
 
 There may be more fields to be introduced.
 

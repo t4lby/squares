@@ -11,5 +11,7 @@ namespace LevelBuilding
         public bool Fixed { get; set; }
 
         public char[] JoinDirections { get; set; }
+
+        public string Identifier { get; set; }
     }
 }
