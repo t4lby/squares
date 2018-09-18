@@ -33,9 +33,10 @@ public abstract class Level : MonoBehaviour
 
     protected void Update()
     {
-        if (Game.Players[0].Squares.Count == 0)
+        if (Game.Players.Count > 0
+            && Game.Players[0].Squares.Count == 0)
         {
-            PauseGame();
+            Game.Players[0].UI.GameOverUI.SetActive(true);
         }
     }
 

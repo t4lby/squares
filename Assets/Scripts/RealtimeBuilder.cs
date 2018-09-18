@@ -56,7 +56,6 @@ public class RealtimeBuilder : MonoBehaviour
     {
         UI.UpdateListeners(SelectSquare,
                            SetErase,
-                           SetRotate,
                            SetAssign);
         SetErase();
         SelectedSquare = SquareType.Green;
@@ -148,36 +147,10 @@ public class RealtimeBuilder : MonoBehaviour
         }
 	}
 
-    private void UpdateUIListeners(UIController uI)
-    {
-        foreach (var squareCount in uI.SquareCounts)
-        {
-            var button = squareCount.Value.GetComponent<Button>();
-            button.onClick.RemoveAllListeners();
-            button.onClick.AddListener(delegate { SelectSquare(squareCount.Key); });
-        }
-        uI.Erase.onClick.RemoveAllListeners();
-        uI.Erase.onClick.AddListener(SetErase);
-        uI.Rotate.onClick.RemoveAllListeners();
-        uI.Rotate.onClick.AddListener(SetRotate);
-        uI.Assign.onClick.RemoveAllListeners();
-        uI.Assign.onClick.AddListener(SetAssign);
-    }
-
     public void SetErase()
     {
         DestroyBuildSquare();
         _Tool = Tool.Erase;
-        if (_Selector == null)
-        {
-            _Selector = SpawnSelector();
-        }
-    }
-
-    public void SetRotate()
-    {
-        DestroyBuildSquare();
-        _Tool = Tool.Rotate;
         if (_Selector == null)
         {
             _Selector = SpawnSelector();

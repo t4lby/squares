@@ -143,10 +143,11 @@ public abstract class Square : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Bullet") ||
+        if (collision.gameObject.CompareTag("Bullet") 
+            && !this.Invincible ||
             collision.gameObject.CompareTag("Square")
-            & !this.Invincible &&
-            (this.Player == null | collision.gameObject.GetComponent<Square>().Player == null))
+            && !this.Invincible &&
+            (this.Player == null || collision.gameObject.GetComponent<Square>().Player == null))
         {
             this.Health -= collision.relativeVelocity.magnitude / this.Durability;
             this.UpdateTransparency();
@@ -173,11 +174,6 @@ public abstract class Square : MonoBehaviour
             this.UpdateTransparency();
         }
 
-        if (Health < 0 && !Invincible)
-        {
-            Factory.DestroySquare(this);
-        }
-
         if (other.CompareTag("BuildSquare"))
         {
             var buildSquare = other.GetComponent<Square>();
@@ -201,6 +197,13 @@ public abstract class Square : MonoBehaviour
                 Game.Players[0].Builder.JointTargets.Add(this);
             }
         }
+
+        if (Health < 0 && !Invincible)
+        {
+            Factory.DestroySquare(this);
+        }
+
+
     }
 
     private void OnTriggerExit(Collider other)

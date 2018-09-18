@@ -226,7 +226,10 @@ public class Factory : MonoBehaviour
                          square.GetComponent<Rigidbody>().velocity,
                          square.Color);
 
-        Tools.SetTriggerSurrounding(square, false);
+        if (square.Player != null)
+        {
+            Tools.SetTriggerSurrounding(square, false);
+        }
         //remove joints qq: move to own method.
         var toUnConnect = new List<Square>();
         foreach (var connectedSquare in square.ConnectedTo)
@@ -310,7 +313,7 @@ public class Factory : MonoBehaviour
                     var square = this.SpawnSquare(level[i,j].Color,
                                                 new Vector3(j, -i, 0) * Game.SquareSize,
                                                 Vector3.zero,
-                                                Quaternion.identity);
+                                                  rotation);
                     if (level[i,j].Fixed)
                     {
                         square.GetComponent<Rigidbody>().constraints =

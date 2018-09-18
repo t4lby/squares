@@ -21,10 +21,10 @@ public class WhiteSquare : Square
     protected override void SetSquareProperties()
     {
         this.Health = 1;
-        this.Durability = 60;
-        this.RegenerationSpeed = 0.1f;
+        this.Durability = 80;
+        this.RegenerationSpeed = 0.15f;
         this.Color = SquareType.White;
-        this.Acceleration = 20;
+        this.Acceleration = 5;
     }
 
     protected override void UpdateSquare()

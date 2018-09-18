@@ -30,6 +30,7 @@ public class RedSquare : Square
         {
             if (Particles != null)
             {
+                Particles.GetComponent<ParticleSystem>().Play();
                 Particles.SetActive(true);
             }
         }
@@ -37,6 +38,7 @@ public class RedSquare : Square
         {
             if (Particles != null)
             {
+                Particles.GetComponent<ParticleSystem>().Stop();
                 Particles.SetActive(false);
             }
         }

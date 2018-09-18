@@ -10,8 +10,9 @@ public class UIController : MonoBehaviour
 
     public GameObject SquareCountPrefab;
     public Button Erase;
-    public Button Rotate;
     public Button Assign;
+    public Button Restart;
+    public GameObject GameOverUI;
     public Vector3 FirstCountPosition;
     public Vector3 DiffCountPosition;
     public Dictionary<SquareType, GameObject> SquareCounts;
@@ -21,24 +22,26 @@ public class UIController : MonoBehaviour
 
     private SelectSquare _SelectSquareMethod;
 
-    private void Update()
+    private void Start()
     {
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            SceneManager.LoadScene("Editor");
-        }
+        GameOverUI.SetActive(false);
+        Restart.onClick.AddListener(delegate { RestartLevel(); });
+    }
+
+
+    private void RestartLevel()
+    {
+        Game.Players.Clear();
+        SceneManager.LoadScene(0);
     }
 
     public void UpdateListeners(SelectSquare selectSquare,
                                  SetTool setErase,
-                                 SetTool setRotate,
                                  SetTool setAssign)
     {
         UpdateSquareListeners(selectSquare);
         this.Erase.onClick.RemoveAllListeners();
         this.Erase.onClick.AddListener(delegate { setErase(); });
-        this.Rotate.onClick.RemoveAllListeners();
-        this.Rotate.onClick.AddListener(delegate { setRotate(); });
         this.Assign.onClick.RemoveAllListeners();
         this.Assign.onClick.AddListener(delegate { setAssign(); });
         _SelectSquareMethod = selectSquare;
