@@ -9,14 +9,14 @@ namespace LevelBuilding
 {
     public static class LevelReader
     {
-        private static string[] ReadLines(string filePath)
+        private static string[] ReadLines(TextAsset levelData)
         {
-            return File.ReadAllLines(filePath);
+            return levelData.text.Split('\n');
         }
 
-        public static CellInfo[,] ReadLevel(string filePath)
+        public static CellInfo[,] ReadLevel(TextAsset levelData)
         {
-            var lines = ReadLines(filePath);
+            var lines = ReadLines(levelData);
             var sizeInfo = lines[0].Split(',');
             int width;
             int height;

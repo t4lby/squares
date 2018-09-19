@@ -17,14 +17,6 @@ public class Level1 : Level
         }
     }
 
-    protected override int LevelNumber
-    {
-        get
-        {
-            return 1;
-        }
-    }
-
     new private void Start()
     {
         base.Start();
