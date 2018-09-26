@@ -24,7 +24,7 @@ public class WhiteSquare : Square
         this.Durability = 80;
         this.RegenerationSpeed = 0.15f;
         this.Color = SquareType.White;
-        this.Acceleration = 5;
+        this.Acceleration = 10;
     }
 
     protected override void UpdateSquare()

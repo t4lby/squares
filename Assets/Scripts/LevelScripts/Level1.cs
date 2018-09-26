@@ -1,13 +1,13 @@
 ﻿using System;
 using UnityEngine;
 using System.Linq;
+using System.Collections.Generic;
 
 public class Level1 : Level
 {
-    public float FireOnTime;
-    public float FireOffTime;
-    private bool _FireOn;
-    private float _NextFireChange;
+    public float FireToggleTime;
+    public float FireTravelDiff;
+    private Dictionary<Square, float> _FireSquareToggleTimes;
 
     protected override Vector3 SpawnLocation
     {
@@ -20,35 +20,31 @@ public class Level1 : Level
     new private void Start()
     {
         base.Start();
-        _FireOn = false;
-        _NextFireChange = Time.time;
+        _FireSquareToggleTimes = new Dictionary<Square, float>();
+        var nextToggleTime = Time.time;
+        foreach (var square in LevelSquares.Where(s => s.Identifier == "fire"))
+        {
+            _FireSquareToggleTimes[square] = nextToggleTime;
+            nextToggleTime += FireTravelDiff;
+        }
+        nextToggleTime = Time.time;
+        foreach (var square in LevelSquares.Where(s => s.Identifier == "fireTop"))
+        {
+            _FireSquareToggleTimes[square] = nextToggleTime;
+            nextToggleTime += FireTravelDiff;
+        }
     }
 
     new private void Update()
     {
         base.Update();
-        if (Time.time > _NextFireChange)
+        foreach (var square in LevelSquares.Where(s => s.Identifier == "fire" || s.Identifier == "fireTop"))
         {
-            if (_FireOn)
+            if (Time.time > _FireSquareToggleTimes[square])
             {
-                SetFire(false);
-                _FireOn = false;
-                _NextFireChange = Time.time + FireOffTime;
+                square.Triggered = !square.Triggered;
+                _FireSquareToggleTimes[square] += FireToggleTime;
             }
-            else
-            {
-                SetFire(true);
-                _FireOn = true;
-                _NextFireChange = Time.time + FireOnTime;
-            }
-        }
-    }
-
-    private void SetFire(bool value)
-    {
-        foreach (var square in _LevelSquares.Where(s => s.Identifier == "fire"))
-        {
-            square.Triggered = value;
         }
     }
 }

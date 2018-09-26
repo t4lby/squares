@@ -44,7 +44,7 @@ public static class Algorithms
         {
             if (!components.ContainsKey(square))
             {
-                CheckNode(square, components, i);
+                CheckNode(square, squares, components, i);
                 i++;
             }
         }
@@ -52,15 +52,17 @@ public static class Algorithms
     }
 
     private static void CheckNode(Square square,
+                                  List<Square> squares,
                                   Dictionary<Square, int> components,
                                   int componentNo)
     {
         components[square] = componentNo;
         foreach (var connectedSquare in square.ConnectedTo)
         {
-            if (!components.ContainsKey(connectedSquare))
+            if (!components.ContainsKey(connectedSquare) &&
+                squares.Contains(connectedSquare))
             {
-                CheckNode(connectedSquare, components, componentNo);
+                CheckNode(connectedSquare, squares, components, componentNo);
             }
         }
     }

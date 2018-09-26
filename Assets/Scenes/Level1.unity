@@ -274,5 +274,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Factory: {fileID: 430473193}
   LevelFile: {fileID: 4900000, guid: 7e44142ad86f649eaa6a2489350307f1, type: 3}
-  FireOnTime: 3
-  FireOffTime: 2
+  FireToggleTime: 1.5
+  FireTravelDiff: 0.05

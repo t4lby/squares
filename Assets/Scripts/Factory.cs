@@ -154,10 +154,17 @@ public class Factory : MonoBehaviour
     /// </summary>
     public void FixSquares(Square squareA, Square squareB)
     {
+        if ((squareA.transform.position - squareB.transform.position).magnitude > Game.SquareSize + 0.1f ||
+            (squareA.transform.position - squareB.transform.position).magnitude < Game.SquareSize - 0.1f)
+        {
+            //squares are not in a fixable position. return now.
+            return;
+        }
         var joint = squareA.gameObject.AddComponent<FixedJoint>();
         joint.enablePreprocessing = false;
         joint.enableCollision = false;
         joint.connectedBody = squareB.gameObject.GetComponent<Rigidbody>();
+        joint.connectedAnchor = Tools.BestDirection(joint.connectedAnchor) * Game.SquareSize;
         squareA.ConnectedTo.Add(squareB);
     }
 

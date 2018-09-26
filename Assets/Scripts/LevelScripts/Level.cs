@@ -8,13 +8,13 @@ public abstract class Level : MonoBehaviour
     public Factory Factory;
     public TextAsset LevelFile;
 
-    protected List<Square> _LevelSquares;
+    protected List<Square> LevelSquares;
 
     protected abstract Vector3 SpawnLocation { get; }
 
     protected void Start()
     {
-        _LevelSquares = Factory.SpawnLevel(LevelReader.ReadLevel(LevelFile));
+        LevelSquares = Factory.SpawnLevel(LevelReader.ReadLevel(LevelFile));
         var inv = new Inventory();
         inv.Squares[SquareType.Purple] = 50;
         inv.Squares[SquareType.Blue] = 20;
