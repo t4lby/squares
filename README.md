@@ -11,6 +11,22 @@ Current build objectives..
 --
 
 ## Level designer objectives
-- Define a file format
-- Turns files to scenes
-- Add some sort of event manager?
+- Define a file format DONE
+- Turns files to scenes DONE
+- Add some sort of event manager? KIND OFF levels are scripted and squares in the level designer have ids the scripts can refer to
+- Something in the file that places triggers in locations to aid scripting.
+
+## UI aids
+- Letter on assignment square
+- Drag to orient arrow
+- Mouse displays tool/square only
+
+## General
+- blue squares dont trigger adjacent blue squares
+
+## New squares...
+- Nerve Squares
+- Magnet squares
+- Slow time squares?
+- Hinge squares?
+
