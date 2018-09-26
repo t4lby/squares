@@ -54,4 +54,6 @@ MonoBehaviour:
   SelectedSquare: 0
   SelectorPrefab: {fileID: 1975671033428054, guid: b4bdf78b0347a4717a27472c1a1fd5cc,
     type: 2}
+  ArrowPrefab: {fileID: 1715949961791908, guid: cc58286acb48d4e10a43260c5af1d1ac,
+    type: 2}
   UI: {fileID: 0}

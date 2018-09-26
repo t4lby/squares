@@ -46,6 +46,10 @@ public class RealtimeBuilder : MonoBehaviour
 
     private Selector _Selector;
 
+    public GameObject ArrowPrefab;
+
+    private ArrowController _Arrow;
+
     private Tool _Tool;
 
     private bool _DraggingRotation;
@@ -115,12 +119,15 @@ public class RealtimeBuilder : MonoBehaviour
                         && _BuildSquare != null)
                     {
                         _DraggingRotation = true;
+                        _Arrow = Instantiate(ArrowPrefab).GetComponent<ArrowController>();
+                        _Arrow.BaseTarget = _BuildSquare.transform;
                     }
                     break;
                 case (Tool.Rotate):
                     break;
                 case (Tool.Assign):
-                    if (_Selector.Target != null && _Selector.Target.Player != null)
+                    if (_Selector.Target != null && _Selector.Target.Player != null
+                        && _Selector.Target.Color == SquareType.Blue)
                     {
                         StartCoroutine(MapKeyFromUser(_Selector.Target));
                     }
@@ -142,6 +149,13 @@ public class RealtimeBuilder : MonoBehaviour
                         UI.UpdateSquareCountUI(Player.Inventory.Squares);
                     }
                     _DraggingRotation = false;
+                    Destroy(_Arrow.gameObject);
+                    _BuildSquare.Triggered = false;
+                    JointTargets.Clear();
+                    if (Player.Inventory.Squares[SelectedSquare] <= 0)
+                    {
+                        Destroy(_BuildSquare.gameObject);
+                    }
                     break;
             }
         }
@@ -284,7 +298,7 @@ public class RealtimeBuilder : MonoBehaviour
             {
                 square.Mapped = true;
                 square.Mapping = kcode;
-                Debug.Log(kcode);
+                square.MappingText.text = kcode.ToString();
             }
         }
     }

@@ -102,6 +102,11 @@ public abstract class Square : MonoBehaviour
     /// </summary>
     public string Identifier { get; set; }
 
+    /// <summary>
+    /// The text mesh that displays the mapped key.
+    /// </summary>
+    public TextMesh MappingText { get; set; }
+
     protected abstract void SetSquareProperties();
 
     /// <summary>
@@ -139,6 +144,7 @@ public abstract class Square : MonoBehaviour
         this.SetSquareProperties();
         this.ConnectedTo = new List<Square>();
         this.GetComponent<SpriteRenderer>().color = Game.GetColor(this.Color);
+        this.MappingText = this.GetComponentInChildren<TextMesh>();
     }
 
     private void OnCollisionEnter(Collision collision)
